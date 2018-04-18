@@ -28,6 +28,11 @@ def show_wordcloud(data, title=None):
     plt.imsave(title, wordcloud)
 
 
+def addPreDefinedStopWords():
+    stopwords.add('will')
+    # TODO - Add more stopWords..
+
+
 if __name__ == '__main__':
 
     businessStr = ''
@@ -52,9 +57,7 @@ if __name__ == '__main__':
             elif category == 'Technology':
                 technologyStr += row["Content"]
 
-    stopwords.add('said')
-    stopwords.add('told')
-    stopwords.add('says')
+    addPreDefinedStopWords()
 
     show_wordcloud(businessStr, 'Business')
     show_wordcloud(politicsStr, 'Politics')
