@@ -33,8 +33,15 @@ def addPreDefinedStopWords():
     stop_words.add('thing')
     stop_words.add('think')
     stop_words.add('say')
+    stop_words.add('says')
     stop_words.add('know')
-    # TODO - Add more stopWords..
+    stop_words.add('clear')
+    stop_words.add('despite')
+    stop_words.add('going')
+    stop_words.add('time')
+    stop_words.add('people')
+    stop_words.add('way')
+    # TODO - Add more stopWords...
 
 
 def split_dataset(dataset, train_percentage, feature_headers, target_header):

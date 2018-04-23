@@ -32,7 +32,14 @@ def addPreDefinedStopWords():
     stop_words.add('thing')
     stop_words.add('think')
     stop_words.add('say')
+    stop_words.add('says')
     stop_words.add('know')
+    stop_words.add('clear')
+    stop_words.add('despite')
+    stop_words.add('going')
+    stop_words.add('time')
+    stop_words.add('people')
+    stop_words.add('way')
     # TODO - Add more stopWords..
 
 

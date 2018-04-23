@@ -41,7 +41,9 @@ def addPreDefinedStopWords():
     stop_words.add('clear')
     stop_words.add('despite')
     stop_words.add('going')
-
+    stop_words.add('time')
+    stop_words.add('people')
+    stop_words.add('way')
     # TODO - Add more stopWords..
 
 
