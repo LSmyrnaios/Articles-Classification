@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     count_vectorizer = CountVectorizer(stop_words)
     vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
-    vectorTest = count_vectorizer.fit_transform(test_x['Content'])
+    vectorTest = count_vectorizer.transform(test_x['Content'])
 
     #clf = svm.SVC(kernel='linear', C=1.0)
     clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     lsa = TruncatedSVD(n_components=100)
 
     vectorTrain = lsa.fit_transform(vectorTrain)
-    vectorTest = lsa.fit_transform(vectorTest)
+    vectorTest = lsa.transform(vectorTest)
 
     print "VectorTrain shape::", vectorTrain.shape
     print "VectorTest shape::", vectorTest.shape

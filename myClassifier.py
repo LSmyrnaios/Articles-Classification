@@ -2,9 +2,8 @@
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import accuracy_score
 from sklearn import preprocessing
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -13,7 +12,6 @@ import pandas as pd
 from sklearn.preprocessing import Normalizer
 
 stop_words = set(ENGLISH_STOP_WORDS)
-
 
 def addPreDefinedStopWords():
     stop_words.add('said')
@@ -66,15 +64,15 @@ if __name__ == '__main__':
     train_data = pd.read_csv('train_set.csv', sep="\t")
     test_data = pd.read_csv('test_set.csv', sep="\t")
 
-    print(headers[2:4])
+    #print(headers[2:4])
 
     train_x, test_x, train_y, test_y = split_dataset(train_data, 0.7, headers[2:4], headers[-1])
 
     le = preprocessing.LabelEncoder()
-    le.fit(train_data["Category"])
-    y = le.transform(train_data["Category"])
+    #le.fit(train_data["Category"])
+    y = le.fit_transform(train_data["Category"])
 
-    print 'y : ', set(y)
+    #print 'y : ', set(y)
 
     # Train and Test dataset size details
     print "Train_x Shape :: ", train_x.shape
@@ -93,24 +91,38 @@ if __name__ == '__main__':
 
     # print train_x['Content'][1]
 
+    # Count Vectorizer
     count_vectorizer = CountVectorizer(stop_words)
     vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
-    vectorTest = count_vectorizer.fit_transform(test_x['Content'])
-    clf = RandomForestClassifier(n_estimators=100)
+    vectorTest = count_vectorizer.transform(test_x['Content'])
     print "VectorTrain shape::", vectorTrain.shape
     print "VectorTest shape::", vectorTest.shape
 
+    # LSA
     lsa = TruncatedSVD(n_components=100)
-
     vectorTrain = lsa.fit_transform(vectorTrain)
-    vectorTest = lsa.fit_transform(vectorTest)
+    vectorTest = lsa.transform(vectorTest)
 
-    print "VectorTrain shape::", vectorTrain.shape
-    print "VectorTest shape::", vectorTest.shape
+    print "VectorTrain shape after LSA::", vectorTrain.shape
+    print "VectorTest shape after LSA::", vectorTest.shape
 
+    # CLF
+    clf = RandomForestClassifier(n_estimators=100)
     clf.fit(vectorTrain, train_y)
-
     y_pred = clf.predict(vectorTest)
 
     print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
     print "Test Accuracy  :: ", accuracy_score(test_y, y_pred)
+
+
+    # PipeLine-test.
+
+    # text_clf = Pipeline([('vect', CountVectorizer(stop_words)), ('tfidf', TfidfTransformer()), ('lsa', TruncatedSVD(n_components=100)), ('clf', RandomForestClassifier(n_estimators=100))])
+    # text_clf.fit(train_x['Content'][0:3000], test_x['Content'][0:3000])
+    #
+    # test = test_x['Content']
+    # predicted = text_clf.predict(test)
+    # print np.mean(predicted == test_x['Content'])
+    #
+    # print "Train Accuracy :: ", accuracy_score(train_y, text_clf.predict(train_x['Content']))
+    # print "Test Accuracy  :: ", accuracy_score(test_y, text_clf.predict(test_x['Content']))

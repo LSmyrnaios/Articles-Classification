@@ -89,8 +89,8 @@ if __name__ == '__main__':
     # tfidfX = tfidf.fit_transform(vX)
     # predicted = clf.predict(tfidfX)
 
-    # vX = count_vectorizer.fit_transform(testdata)
-    # tfidfX = tfidf.fit_transform(vX)
+    # vX = count_vectorizer.transform(test_data)
+    # tfidfX = tfidf.transform(vX)
     # predicted = clf.predict(tfidfX)
 
     pipeline = Pipeline([
@@ -98,7 +98,6 @@ if __name__ == '__main__':
         ('tfidf', TfidfTransformer()),
         ('clf', RandomForestClassifier()),
     ])
-
 
     print train_data.shape
 
@@ -109,7 +108,7 @@ if __name__ == '__main__':
         test_data['Content'] += 5 * test_data['Title']
 
     vectorTrain = count_vectorizer.fit_transform(train_data['Content'])
-    vectorTest = count_vectorizer.fit_transform(test_data['Content'])
+    vectorTest = count_vectorizer.transform(test_data['Content'])
     # transformer = TfidfTransformer(smooth_idf=False)
 
     print vectorTrain.shape
@@ -122,7 +121,7 @@ if __name__ == '__main__':
     # vectorTrain = Normalizer(copy=False).fit_transform(vectorTrain)
 
     #vectorTest = lsa.fit_transform(vectorTest)
-    # vectorTest = Normalizer(copy=False).fit_transform(vectorTest)
+    # vectorTest = Normalizer(copy=False).transform(vectorTest)
 
     print vectorTrain.shape
     print vectorTest.shape
