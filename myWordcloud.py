@@ -1,39 +1,53 @@
 # coding=utf-8
-from wordcloud import WordCloud, STOPWORDS
-import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 import csv
 
-stopwords = set(STOPWORDS)
+stop_words = set(ENGLISH_STOP_WORDS)
 
 
 def show_wordcloud(data, title=None):
     print("Creating wordcloud " + title + ' img...')
     wordcloud = WordCloud(
         background_color='black',
-        stopwords=stopwords,
+        stopwords=stop_words,
         max_words=200,
         max_font_size=40,
         scale=5,
-        random_state=1  # chosen at random by flipping a coin; it was heads
-    ).generate(str(data))
-
-    fig = plt.figure(1, figsize=(12, 12))
-    plt.axis('off')
-    if title:
-        fig.suptitle(title, fontsize=20)
-        fig.subplots_adjust(top=2.3)
-
-    # plt.imshow(wordcloud)
-    # plt.show()
-    plt.imsave(title, wordcloud)
+        random_state=1
+    ).generate(str(data)).to_file(title + ".png")
 
 
 def addPreDefinedStopWords():
-    stopwords.add('will')
+    stop_words.add('said')
+    stop_words.add('he')
+    stop_words.add('He')
+    stop_words.add('it')
+    stop_words.add('It')
+    stop_words.add('got')
+    stop_words.add("don't")
+    stop_words.add('like')
+    stop_words.add("didn't")
+    stop_words.add('ago')
+    stop_words.add('went')
+    stop_words.add('did')
+    stop_words.add('day')
+    stop_words.add('just')
+    stop_words.add('thing')
+    stop_words.add('think')
+    stop_words.add('say')
+    stop_words.add('says')
+    stop_words.add('know')
+    stop_words.add('clear')
+    stop_words.add('despite')
+    stop_words.add('going')
+
     # TODO - Add more stopWords..
 
 
 if __name__ == '__main__':
+
+    #print 'StopWords ', stop_words
 
     businessStr = ''
     politicsStr = ''
@@ -42,9 +56,9 @@ if __name__ == '__main__':
     technologyStr = ''
 
     with open('train_set.csv', 'rb') as csvfile:
-        spamreader = csv.DictReader(csvfile, delimiter='\t', quotechar='|')
+        csvReader = csv.DictReader(csvfile, delimiter='\t', quotechar='|')
 
-        for row in spamreader:
+        for row in csvReader:
             category = row["Category"]
             if category == 'Business':
                 businessStr += row["Content"]
