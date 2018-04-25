@@ -10,10 +10,11 @@ from sklearn import preprocessing, metrics
 from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score, cross_val_predict, cross_validate
 from sklearn.pipeline import Pipeline
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import Normalizer
 
-stop_words = set(ENGLISH_STOP_WORDS)
 
+stop_words = set(ENGLISH_STOP_WORDS)
 
 def addPreDefinedStopWords():
     stop_words.add('said')
@@ -60,14 +61,14 @@ def split_dataset(dataset, train_percentage, feature_headers, target_header):
     return train_x, test_x, train_y, test_y
 
 
-def rf_classifier():
+def rf_classifier(usePipeline):
 
     print 'Running rfClassifier...\n'
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
 
-    train_data = pd.read_csv('Resources/train_set.csv', sep="\t")
-    test_data = pd.read_csv('Resources/test_set.csv', sep="\t")
+    train_data = pd.read_csv('Resources/csv/train_set.csv', sep="\t")
+    test_data = pd.read_csv('Resources/csv/test_set.csv', sep="\t")
 
     # print(headers[2:4])
 
@@ -95,98 +96,124 @@ def rf_classifier():
 
     # print train_x['Content'][1]
 
-    start_time_diadox = time.time()
+    # Values to be returned later.
+    predictedAccuracy = 0
+    predictedPercision = 0
+    predictedRecall = 0
+    predicedF_Measure = 0
 
-    # Count Vectorizer
-    count_vectorizer = CountVectorizer(stop_words)
-    vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
-    vectorTest = count_vectorizer.transform(test_x['Content'])
-    print "VectorTrain shape::", vectorTrain.shape
-    print "VectorTest shape::", vectorTest.shape
+    if usePipeline:
+        print '\nRunning pipeline-version of rfClassifier...'
 
-    # TfidfTransformer
-    tfidf = TfidfTransformer()
-    vectorTrain = tfidf.fit_transform(vectorTrain)
-    vectorTest = tfidf.transform(vectorTest)
+        # PipeLine-test.
+        start_time_pipeline = time.time()
 
-    # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
-    # tfidf_v = TfidfVectorizer(stop_words)
-    # vectorTrain = tfidf_v.fit_transform(train_x['Content'])
-    # vectorTest = tfidf_v.transform(test_x['Content'])
+        pipeline = Pipeline([
+            ('vect', CountVectorizer(stop_words)),
+            ('tfidf', TfidfTransformer()),
+            # ('tfidf_v', TfidfVectorizer(stop_words)),
+            ('lsa', TruncatedSVD(n_components=100)),
+            ('norm', Normalizer(norm="l2", copy=True)),
+            ('clf', RandomForestClassifier(n_estimators=100))
+        ])
 
-    # LSA
-    lsa = TruncatedSVD(n_components=100)
-    vectorTrain = lsa.fit_transform(vectorTrain)
-    vectorTest = lsa.transform(vectorTest)
+        predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
+        # Now evaluate all steps on test set
+        predicted_test = pipeline.predict(test_x['Content'])
 
-    print "VectorTrain shape after LSA::", vectorTrain.shape
-    print "VectorTest shape after LSA::", vectorTest.shape
+        print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
+        print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
 
-    # Normalizer
-    norm = Normalizer(norm="l2", copy=True)
-    vectorTrain = norm.fit_transform(vectorTrain)
-    vectorTest = norm.transform(vectorTest)
+        print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
 
-    # CLF
-    clf = RandomForestClassifier(n_estimators=100)
+    else:
+        print '\nRunning successional-version of rfClassifier...'
 
-    scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
-    predicted = cross_validate(clf, vectorTrain, train_y, cv=5, scoring=scoring, return_train_score=False)
-    # print("Accuracy: %0.2f (+/- %0.2f)" % (predicted.mean(), predicted.std() * 2))
-    print sorted(predicted.keys())
-    print "Accuracy: ", predicted["test_accuracy"], "/ Precision: ", predicted["test_precision_macro"], "/ F-Measure: ", predicted["test_f1_macro"], "/ Recall: ", predicted["test_recall_macro"]
-    # predicted = cross_val_score(clf, vectorTrain, train_y, cv=2, scoring='precision')
-    # print "Precision: ", precision_score(train_y, predicted, average='macro')
+        start_time_successional = time.time()
 
-    # predicted = cross_val_score(clf, vectorTrain, train_y, cv=2, scoring='recall')
-    # print "Recall: ", recall_score(train_y, predicted, average='macro')
+        # Count Vectorizer
+        count_vectorizer = CountVectorizer(stop_words)
+        vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
+        vectorTest = count_vectorizer.transform(test_x['Content'])
+        print "VectorTrain shape::", vectorTrain.shape
+        print "VectorTest shape::", vectorTest.shape
 
-    # predicted = cross_val_score(clf, vectorTrain, train_y, cv=2, scoring='f1_macro')
-    #  print "F-Measure: ", f1_score(train_y, predicted, average='macro')
+        # TfidfTransformer
+        tfidf = TfidfTransformer()
+        vectorTrain = tfidf.fit_transform(vectorTrain)
+        vectorTest = tfidf.transform(vectorTest)
 
-    # predicted = cross_val_score(clf, vectorTrain, train_y, cv=2, scoring='accuracy')
-    #  print "Accuracy: ", accuracy_score(train_y, predicted)
+        # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
+        # tfidf_v = TfidfVectorizer(stop_words)
+        # vectorTrain = tfidf_v.fit_transform(train_x['Content'])
+        # vectorTest = tfidf_v.transform(test_x['Content'])
 
-    # GridSearch
-    # parameters = {'n_estimators': [130, 110, 100, 80, 50, 30, 20, 10]}
-    # svr = RandomForestClassifier()
-    # clf = GridSearchCV(svr, parameters)
-    #
-    clf.fit(vectorTrain, train_y)
-    y_pred = clf.predict(vectorTest)
+        # LSA
+        lsa = TruncatedSVD(n_components=100)
+        vectorTrain = lsa.fit_transform(vectorTrain)
+        vectorTest = lsa.transform(vectorTest)
 
-    # Best GridSearch params
-    # print clf.best_params_
+        print "VectorTrain shape after LSA::", vectorTrain.shape
+        print "VectorTest shape after LSA::", vectorTest.shape
 
-    print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
-    print "Test Accuracy  :: ", accuracy_score(test_y, y_pred)
+        # Normalizer
+        norm = Normalizer(norm="l2", copy=True)
+        vectorTrain = norm.fit_transform(vectorTrain)
+        vectorTest = norm.transform(vectorTest)
 
-    print "Elapsed time of diadoxika: ", time.time() - start_time_diadox
+        # CLF
+        clf = RandomForestClassifier(n_estimators=100)
 
+        scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
+        predicted = cross_validate(clf, vectorTrain, train_y, cv=5, scoring=scoring, return_train_score=False)
+        # print("Accuracy: %0.2f (+/- %0.2f)" % (predicted.mean(), predicted.std() * 2))
+        # print sorted(predicted.keys())
 
-    # PipeLine-test.
-    start_time_pipeline = time.time()
+        # Hold these values to be returned later.
+        predictedAccuracy = np.mean(predicted["test_accuracy"])
+        predictedPercision = np.mean(predicted["test_precision_macro"])
+        predictedRecall = np.mean(predicted["test_recall_macro"])
+        predicedF_Measure = np.mean(predicted["test_f1_macro"])
 
-    pipeline = Pipeline([
-        ('vect', CountVectorizer(stop_words)),
-        ('tfidf', TfidfTransformer()),
-        # ('tfidf_v', TfidfVectorizer(stop_words)),
-        ('lsa', TruncatedSVD(n_components=100)),
-        ('norm', Normalizer(norm="l2", copy=True)),
-        ('clf', RandomForestClassifier(n_estimators=100))
-    ])
+        # DEBUG!
+        print "Accuracy: ", predictedAccuracy,\
+            "/ Precision: ", predictedPercision,\
+            "/ Recall: ", predictedRecall,\
+            "/ F-Measure: ", predicedF_Measure
 
-    predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
-    # Now evaluate all steps on test set
-    predicted_test = pipeline.predict(test_x['Content'])
+        # predicted = cross_val_score(clf, vectorTrain, train_y, cv=2, scoring='precision')
+        # print "Precision: ", precision_score(train_y, predicted, average='macro')
 
-    print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
-    print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
+        # predicted = cross_val_score(clf, vectorTrain, train_y, cv=2, scoring='recall')
+        # print "Recall: ", recall_score(train_y, predicted, average='macro')
 
-    print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
+        # predicted = cross_val_score(clf, vectorTrain, train_y, cv=2, scoring='f1_macro')
+        #  print "F-Measure: ", f1_score(train_y, predicted, average='macro')
+
+        # predicted = cross_val_score(clf, vectorTrain, train_y, cv=2, scoring='accuracy')
+        #  print "Accuracy: ", accuracy_score(train_y, predicted)
+
+        # GridSearch
+        # parameters = {'n_estimators': [130, 110, 100, 80, 50, 30, 20, 10]}
+        # svr = RandomForestClassifier()
+        # clf = GridSearchCV(svr, parameters)
+
+        # clf.fit(vectorTrain, train_y)
+        # y_pred = clf.predict(vectorTest)
+
+        # print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
+        # print "Test Accuracy :: ", accuracy_score(test_y, y_pred)
+
+        # Best GridSearch params
+        # print clf.best_params_
+
+        print "Elapsed time of diadoxika: ", time.time() - start_time_successional
+
 
     print 'rfClassifier finished!\n'
+    return [predictedAccuracy, predictedPercision, predictedRecall, predicedF_Measure]
 
 
 if __name__ == '__main__':
-    rf_classifier()
+    usePipeline = False
+    rf_classifier(usePipeline)

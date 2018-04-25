@@ -3,14 +3,15 @@ import time
 
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfTransformer, TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn import preprocessing
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_validate
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 import pandas as pd
-from sklearn.preprocessing import Normalizer, MinMaxScaler, MaxAbsScaler
+import numpy as np
+from sklearn.preprocessing import Normalizer
+
 
 stop_words = set(ENGLISH_STOP_WORDS)
 
@@ -59,14 +60,14 @@ def split_dataset(dataset, train_percentage, feature_headers, target_header):
     return train_x, test_x, train_y, test_y
 
 
-def nb_classifier():
+def nb_classifier(usePipeline):
 
     print 'Running nbClassifier...\n'
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
 
-    train_data = pd.read_csv('Resources/train_set.csv', sep="\t")
-    test_data = pd.read_csv('Resources/test_set.csv', sep="\t")
+    train_data = pd.read_csv('Resources/csv/train_set.csv', sep="\t")
+    test_data = pd.read_csv('Resources/csv/test_set.csv', sep="\t")
 
     #print(headers[2:4])
 
@@ -94,75 +95,107 @@ def nb_classifier():
 
     # print train_x['Content'][1]
 
-    start_time_diadox = time.time()
+    # Values to be returned later.
+    predictedAccuracy = 0
+    predictedPercision = 0
+    predictedRecall = 0
+    predicedF_Measure = 0
 
-    # Count Vectorizer
-    count_vectorizer = CountVectorizer(stop_words)
-    vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
-    vectorTest = count_vectorizer.transform(test_x['Content'])
-    print "VectorTrain shape::", vectorTrain.shape
-    print "VectorTest shape::", vectorTest.shape
+    if usePipeline:
+        print '\nRunning pipeline-version of nbClassifier...'
 
-    # TfidfTransformer
-    tfidf = TfidfTransformer()
-    vectorTrain = tfidf.fit_transform(vectorTrain)
-    vectorTest = tfidf.transform(vectorTest)
+        # PipeLine.
+        start_time_pipeline = time.time()
 
-    # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
-    # tfidf_v = TfidfVectorizer(stop_words)
-    # vectorTrain = tfidf_v.fit_transform(train_x['Content'])
-    # vectorTest = tfidf_v.transform(test_x['Content'])
+        pipeline = Pipeline([
+            ('vect', CountVectorizer(stop_words)),
+            ('tfidf', TfidfTransformer()),
+            # ('tfidf_v', TfidfVectorizer(stop_words)),
+            ('norm', Normalizer(norm="l2", copy=True)),
+            ('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True))
+        ])
 
-    # Here we don't use LSA, as it has some issues.
+        predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
+        # Now evaluate all steps on test set
+        predicted_test = pipeline.predict(test_x['Content'])
 
-    # Normalizer
-    norm = Normalizer(norm="l2", copy=True)
-    vectorTrain = norm.fit_transform(vectorTrain)
-    vectorTest = norm.transform(vectorTest)
+        print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
+        print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
 
-    # CLF
-    clf = MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)
-
-    # GridSearch
-    # parameters = {'alpha': [10, 2, 1, 0.5, 0.1, 0.01, 0.001, 0.0001]}
-    # svr = MultinomialNB()
-    # clf = GridSearchCV(svr, parameters)
+        print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
 
 
-    clf.fit(vectorTrain, train_y)
-    y_pred = clf.predict(vectorTest)
+    else:
+        print '\nRunning successional-version of nbClassifier...'
 
-    # Best GridSearch params
-    # print clf.best_params_
+        start_time_successional = time.time()
 
-    print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
-    print "Test Accuracy  :: ", accuracy_score(test_y, y_pred)
+        # Count Vectorizer
+        count_vectorizer = CountVectorizer(stop_words)
+        vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
+        vectorTest = count_vectorizer.transform(test_x['Content'])
+        print "VectorTrain shape::", vectorTrain.shape
+        print "VectorTest shape::", vectorTest.shape
 
-    print "Elapsed time of diadoxika: ", time.time() - start_time_diadox
+        # TfidfTransformer
+        tfidf = TfidfTransformer()
+        vectorTrain = tfidf.fit_transform(vectorTrain)
+        vectorTest = tfidf.transform(vectorTest)
+
+        # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
+        # tfidf_v = TfidfVectorizer(stop_words)
+        # vectorTrain = tfidf_v.fit_transform(train_x['Content'])
+        # vectorTest = tfidf_v.transform(test_x['Content'])
+
+        # Here we don't use LSA, as it has some issues (negative numbers).
+
+        # Normalizer
+        norm = Normalizer(norm="l2", copy=True)
+        vectorTrain = norm.fit_transform(vectorTrain)
+        vectorTest = norm.transform(vectorTest)
+
+        # CLF
+        clf = MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)
 
 
-    # PipeLine.
-    start_time_pipeline = time.time()
+        scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
+        predicted = cross_validate(clf, vectorTrain, train_y, cv=5, scoring=scoring, return_train_score=False)
+        # print("Accuracy: %0.2f (+/- %0.2f)" % (predicted.mean(), predicted.std() * 2))
+        # print sorted(predicted.keys())
 
-    pipeline = Pipeline([
-        ('vect', CountVectorizer(stop_words)),
-        ('tfidf', TfidfTransformer()),
-        # ('tfidf_v', TfidfVectorizer(stop_words)),
-        ('norm', Normalizer(norm="l2", copy=True)),
-        ('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True))
-    ])
+        # Hold these values to be returned later.
+        predictedAccuracy = np.mean(predicted["test_accuracy"])
+        predictedPercision = np.mean(predicted["test_precision_macro"])
+        predictedRecall = np.mean(predicted["test_recall_macro"])
+        predicedF_Measure = np.mean(predicted["test_f1_macro"])
 
-    predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
-    # Now evaluate all steps on test set
-    predicted_test = pipeline.predict(test_x['Content'])
+        # DEBUG!
+        print "Accuracy: ", predictedAccuracy,\
+            "/ Precision: ", predictedPercision,\
+            "/ Recall: ", predictedRecall,\
+            "/ F-Measure: ", predicedF_Measure
 
-    print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
-    print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
+        # GridSearch
+        # parameters = {'alpha': [10, 2, 1, 0.5, 0.1, 0.01, 0.001, 0.0001]}
+        # svr = MultinomialNB()
+        # clf = GridSearchCV(svr, parameters)
 
-    print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
+        # clf.fit(vectorTrain, train_y)
+        # y_pred = clf.predict(vectorTest)
+        #
+        # print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
+        # print "Test Accuracy :: ", accuracy_score(test_y, y_pred)
+
+        # Best GridSearch params
+        # print clf.best_params_
+
+        print "Elapsed time of diadoxika: ", time.time() - start_time_successional
+
 
     print 'nbClassifier finished!\n'
+    return [predictedAccuracy, predictedPercision, predictedRecall, predicedF_Measure]
 
 
 if __name__ == '__main__':
-    nb_classifier()
+    usePipeline = False
+    nb_classifier(usePipeline)

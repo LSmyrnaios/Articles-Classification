@@ -5,7 +5,6 @@ import csv
 
 stop_words = set(ENGLISH_STOP_WORDS)
 
-
 def addPreDefinedStopWords():
     stop_words.add('said')
     stop_words.add('he')
@@ -36,7 +35,7 @@ def addPreDefinedStopWords():
 
 
 def show_wordcloud(data, title=None):
-    print("Creating wordcloud " + title + ' img...')
+    print("Creating wordcloud \"" + title + '\" img...')
     wordcloud = WordCloud(
         background_color='black',
         stopwords=stop_words,
@@ -44,12 +43,12 @@ def show_wordcloud(data, title=None):
         max_font_size=40,
         scale=5,
         random_state=1
-    ).generate(str(data)).to_file("Resources/" + title + ".png")
+    ).generate(str(data)).to_file("Resources/csv/" + title + ".png")
 
 
 def my_wordcloud():
 
-    print 'Running myWordcoud...\n'
+    print 'Running myWordcloud...\n'
 
     #print 'StopWords ', stop_words
 
@@ -59,7 +58,7 @@ def my_wordcloud():
     filmStr = ''
     technologyStr = ''
 
-    with open('Resources/train_set.csv', 'rb') as csvfile:
+    with open('Resources/csv/train_set.csv', 'rb') as csvfile:
         csvReader = csv.DictReader(csvfile, delimiter='\t', quotechar='|')
 
         for row in csvReader:

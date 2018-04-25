@@ -7,13 +7,14 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import svm
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn import preprocessing
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_validate
 from sklearn.pipeline import Pipeline
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import Normalizer
 
-stop_words = set(ENGLISH_STOP_WORDS)
 
+stop_words = set(ENGLISH_STOP_WORDS)
 
 def addPreDefinedStopWords():
     stop_words.add('said')
@@ -60,14 +61,14 @@ def split_dataset(dataset, train_percentage, feature_headers, target_header):
     return train_x, test_x, train_y, test_y
 
 
-def svm_classifier():
+def svm_classifier(usePipeline):
 
     print 'Running svmClassifier...\n'
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
 
-    train_data = pd.read_csv('Resources/train_set.csv', sep="\t")
-    test_data = pd.read_csv('Resources/test_set.csv', sep="\t")
+    train_data = pd.read_csv('Resources/csv/train_set.csv', sep="\t")
+    test_data = pd.read_csv('Resources/csv/test_set.csv', sep="\t")
 
     # print(headers[2:4])
 
@@ -97,82 +98,114 @@ def svm_classifier():
 
     # print train_x['Content'][1]
 
-    start_time_diadox = time.time()
+    # Values to be returned later.
+    predictedAccuracy = 0
+    predictedPercision = 0
+    predictedRecall = 0
+    predicedF_Measure = 0
 
-    # Count Vectorizer
-    count_vectorizer = CountVectorizer(stop_words)
-    vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
-    vectorTest = count_vectorizer.transform(test_x['Content'])
-    print "VectorTrain shape::", vectorTrain.shape
-    print "VectorTest shape::", vectorTest.shape
+    if usePipeline:
+        print '\nRunning pipeline-version of svmClassifier...'
 
-    # TfidfTransformer
-    tfidf = TfidfTransformer()
-    vectorTrain = tfidf.fit_transform(vectorTrain)
-    vectorTest = tfidf.transform(vectorTest)
+        # PipeLine.
+        start_time_pipeline = time.time()
 
-    # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
-    # tfidf_v = TfidfVectorizer(stop_words)
-    # vectorTrain = tfidf_v.fit_transform(train_x['Content'])
-    # vectorTest = tfidf_v.transform(test_x['Content'])
+        pipeline = Pipeline([
+            ('vect', CountVectorizer(stop_words)),
+            ('tfidf', TfidfTransformer()),
+            # ('tfidf_v', TfidfVectorizer(stop_words)),
+            ('lsa', TruncatedSVD(n_components=100)),
+            ('norm', Normalizer(norm="l2", copy=True)),
+            ('clf', svm.SVC(kernel='linear', C=1.0))
+            # ('clf', svm.SVC(kernel='rbf', C=1.0, gamma='auto'))
+        ])
 
-    # LSA
-    lsa = TruncatedSVD(n_components=100)
-    vectorTrain = lsa.fit_transform(vectorTrain)
-    vectorTest = lsa.transform(vectorTest)
+        predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
+        # Now evaluate all steps on test set
+        predicted_test = pipeline.predict(test_x['Content'])
 
-    print "VectorTrain shape after LSA::", vectorTrain.shape
-    print "VectorTest shape after LSA::", vectorTest.shape
+        print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
+        print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
 
-    # Normalizer
-    norm = Normalizer(norm="l2", copy=True)
-    vectorTrain = norm.fit_transform(vectorTrain)
-    vectorTest = norm.transform(vectorTest)
+        print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
 
-    # CLF
-    clf = svm.SVC(kernel='linear', C=1.0)
-    # clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
+    else:
+        print '\nRunning successional-version of svmClassifier...'
 
-    # GridSearch (find the best parameters)
-    # parameters = {'kernel': ('linear', 'rbf'), 'C': [1.5, 10], 'gamma': [0, 'auto']}
-    # svr = svm.SVC()
-    # clf = GridSearchCV(svr, parameters)
+        start_time_successional = time.time()
 
-    clf.fit(vectorTrain, train_y)
-    y_pred = clf.predict(vectorTest)
+        # Count Vectorizer
+        count_vectorizer = CountVectorizer(stop_words)
+        vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
+        vectorTest = count_vectorizer.transform(test_x['Content'])
+        print "VectorTrain shape::", vectorTrain.shape
+        print "VectorTest shape::", vectorTest.shape
 
-    # Best GridSearch params
-    #print clf.best_params_
+        # TfidfTransformer
+        tfidf = TfidfTransformer()
+        vectorTrain = tfidf.fit_transform(vectorTrain)
+        vectorTest = tfidf.transform(vectorTest)
 
-    print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
-    print "Test Accuracy  :: ", accuracy_score(test_y, y_pred)
+        # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
+        # tfidf_v = TfidfVectorizer(stop_words)
+        # vectorTrain = tfidf_v.fit_transform(train_x['Content'])
+        # vectorTest = tfidf_v.transform(test_x['Content'])
 
-    print "Elapsed time of diadoxika: ", time.time() - start_time_diadox
+        # LSA
+        lsa = TruncatedSVD(n_components=100)
+        vectorTrain = lsa.fit_transform(vectorTrain)
+        vectorTest = lsa.transform(vectorTest)
 
-    # PipeLine.
-    start_time_pipeline = time.time()
+        print "VectorTrain shape after LSA::", vectorTrain.shape
+        print "VectorTest shape after LSA::", vectorTest.shape
 
-    pipeline = Pipeline([
-        ('vect', CountVectorizer(stop_words)),
-        ('tfidf', TfidfTransformer()),
-        # ('tfidf_v', TfidfVectorizer(stop_words)),
-        ('lsa', TruncatedSVD(n_components=100)),
-        ('norm', Normalizer(norm="l2", copy=True)),
-        ('clf', svm.SVC(kernel='linear', C=1.0))
-        # ('clf', svm.SVC(kernel='rbf', C=1.0, gamma='auto'))
-    ])
+        # Normalizer
+        norm = Normalizer(norm="l2", copy=True)
+        vectorTrain = norm.fit_transform(vectorTrain)
+        vectorTest = norm.transform(vectorTest)
 
-    predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
-    # Now evaluate all steps on test set
-    predicted_test = pipeline.predict(test_x['Content'])
+        # CLF
+        clf = svm.SVC(kernel='linear', C=1.0)
+        # clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
 
-    print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
-    print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
+        scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
+        predicted = cross_validate(clf, vectorTrain, train_y, cv=5, scoring=scoring, return_train_score=False)
+        # print("Accuracy: %0.2f (+/- %0.2f)" % (predicted.mean(), predicted.std() * 2))
+        # print sorted(predicted.keys())
 
-    print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
+        # Hold these values to be returned later.
+        predictedAccuracy = np.mean(predicted["test_accuracy"])
+        predictedPercision = np.mean(predicted["test_precision_macro"])
+        predictedRecall = np.mean(predicted["test_recall_macro"])
+        predicedF_Measure = np.mean(predicted["test_f1_macro"])
+
+        # DEBUG!
+        print "Accuracy: ", predictedAccuracy,\
+            "/ Precision: ", predictedPercision,\
+            "/ Recall: ", predictedRecall,\
+            "/ F-Measure: ", predicedF_Measure
+
+        # GridSearch (find the best parameters)
+        # parameters = {'kernel': ('linear', 'rbf'), 'C': [1.5, 10], 'gamma': [0, 'auto']}
+        # svr = svm.SVC()
+        # clf = GridSearchCV(svr, parameters)
+
+        # clf.fit(vectorTrain, train_y)
+        # y_pred = clf.predict(vectorTest)
+        #
+        # print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
+        # print "Test Accuracy :: ", accuracy_score(test_y, y_pred)
+
+        # Best GridSearch params
+        #print clf.best_params_
+
+        print "Elapsed time of diadoxika: ", time.time() - start_time_successional
+
 
     print 'svmClassifier finished!\n'
+    return [predictedAccuracy, predictedPercision, predictedRecall, predicedF_Measure]
 
 
 if __name__ == '__main__':
-    svm_classifier()
+    usePipeline = False
+    svm_classifier(usePipeline)
