@@ -6,18 +6,6 @@ import csv
 stop_words = set(ENGLISH_STOP_WORDS)
 
 
-def show_wordcloud(data, title=None):
-    print("Creating wordcloud " + title + ' img...')
-    wordcloud = WordCloud(
-        background_color='black',
-        stopwords=stop_words,
-        max_words=200,
-        max_font_size=40,
-        scale=5,
-        random_state=1
-    ).generate(str(data)).to_file(title + ".png")
-
-
 def addPreDefinedStopWords():
     stop_words.add('said')
     stop_words.add('he')
@@ -47,7 +35,21 @@ def addPreDefinedStopWords():
     # TODO - Add more stopWords..
 
 
-if __name__ == '__main__':
+def show_wordcloud(data, title=None):
+    print("Creating wordcloud " + title + ' img...')
+    wordcloud = WordCloud(
+        background_color='black',
+        stopwords=stop_words,
+        max_words=200,
+        max_font_size=40,
+        scale=5,
+        random_state=1
+    ).generate(str(data)).to_file("Resources/" + title + ".png")
+
+
+def my_wordcloud():
+
+    print 'Running myWordcoud...\n'
 
     #print 'StopWords ', stop_words
 
@@ -57,7 +59,7 @@ if __name__ == '__main__':
     filmStr = ''
     technologyStr = ''
 
-    with open('train_set.csv', 'rb') as csvfile:
+    with open('Resources/train_set.csv', 'rb') as csvfile:
         csvReader = csv.DictReader(csvfile, delimiter='\t', quotechar='|')
 
         for row in csvReader:
@@ -80,3 +82,9 @@ if __name__ == '__main__':
     show_wordcloud(footballStr, 'Football')
     show_wordcloud(filmStr, 'Film')
     show_wordcloud(technologyStr, 'Technology')
+
+    print 'myWordcloud finished!\n'
+
+
+if __name__ == '__main__':
+    my_wordcloud()

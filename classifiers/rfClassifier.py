@@ -7,7 +7,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score
 from sklearn import preprocessing, metrics
-import numpy as np
 from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score, cross_val_predict, cross_validate
 from sklearn.pipeline import Pipeline
 import pandas as pd
@@ -61,12 +60,14 @@ def split_dataset(dataset, train_percentage, feature_headers, target_header):
     return train_x, test_x, train_y, test_y
 
 
-if __name__ == '__main__':
+def rf_classifier():
+
+    print 'Running rfClassifier...\n'
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
 
-    train_data = pd.read_csv('train_set.csv', sep="\t")
-    test_data = pd.read_csv('test_set.csv', sep="\t")
+    train_data = pd.read_csv('Resources/train_set.csv', sep="\t")
+    test_data = pd.read_csv('Resources/test_set.csv', sep="\t")
 
     # print(headers[2:4])
 
@@ -183,3 +184,9 @@ if __name__ == '__main__':
     print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
 
     print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
+
+    print 'rfClassifier finished!\n'
+
+
+if __name__ == '__main__':
+    rf_classifier()

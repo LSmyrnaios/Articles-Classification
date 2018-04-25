@@ -4,17 +4,16 @@ import time
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfTransformer, TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn import svm
+from sklearn.metrics import classification_report, accuracy_score
 from sklearn import preprocessing
-import numpy as np
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 import pandas as pd
-from sklearn.preprocessing import Normalizer, MinMaxScaler, MaxAbsScaler
+from sklearn.preprocessing import Normalizer
 
 stop_words = set(ENGLISH_STOP_WORDS)
+
 
 def addPreDefinedStopWords():
     stop_words.add('said')
@@ -42,7 +41,7 @@ def addPreDefinedStopWords():
     stop_words.add('time')
     stop_words.add('people')
     stop_words.add('way')
-    # TODO - Add more stopWords...
+    # TODO - Add more stopWords..
 
 
 def split_dataset(dataset, train_percentage, feature_headers, target_header):
@@ -61,21 +60,25 @@ def split_dataset(dataset, train_percentage, feature_headers, target_header):
     return train_x, test_x, train_y, test_y
 
 
-if __name__ == '__main__':
+def svm_classifier():
+
+    print 'Running svmClassifier...\n'
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
 
-    train_data = pd.read_csv('train_set.csv', sep="\t")
-    test_data = pd.read_csv('test_set.csv', sep="\t")
+    train_data = pd.read_csv('Resources/train_set.csv', sep="\t")
+    test_data = pd.read_csv('Resources/test_set.csv', sep="\t")
 
-    #print(headers[2:4])
+    # print(headers[2:4])
 
+    # Split dataSet to 70-30.
     train_x, test_x, train_y, test_y = split_dataset(train_data, 0.7, headers[2:4], headers[-1])
 
+    # LE
     le = preprocessing.LabelEncoder()
     y = le.fit_transform(train_data["Category"])
 
-    #print 'y : ', set(y)
+    # print 'y : ', set(y)
 
     # Train and Test dataset size details
     print "Train_x Shape :: ", train_x.shape
@@ -113,7 +116,13 @@ if __name__ == '__main__':
     # vectorTrain = tfidf_v.fit_transform(train_x['Content'])
     # vectorTest = tfidf_v.transform(test_x['Content'])
 
-    # Here we don't use LSA, as it has some issues.
+    # LSA
+    lsa = TruncatedSVD(n_components=100)
+    vectorTrain = lsa.fit_transform(vectorTrain)
+    vectorTest = lsa.transform(vectorTest)
+
+    print "VectorTrain shape after LSA::", vectorTrain.shape
+    print "VectorTest shape after LSA::", vectorTest.shape
 
     # Normalizer
     norm = Normalizer(norm="l2", copy=True)
@@ -121,25 +130,24 @@ if __name__ == '__main__':
     vectorTest = norm.transform(vectorTest)
 
     # CLF
-    clf = MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)
+    clf = svm.SVC(kernel='linear', C=1.0)
+    # clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
 
-    # GridSearch
-    # parameters = {'alpha': [10, 2, 1, 0.5, 0.1, 0.01, 0.001, 0.0001]}
-    # svr = MultinomialNB()
+    # GridSearch (find the best parameters)
+    # parameters = {'kernel': ('linear', 'rbf'), 'C': [1.5, 10], 'gamma': [0, 'auto']}
+    # svr = svm.SVC()
     # clf = GridSearchCV(svr, parameters)
-
 
     clf.fit(vectorTrain, train_y)
     y_pred = clf.predict(vectorTest)
 
     # Best GridSearch params
-    # print clf.best_params_
+    #print clf.best_params_
 
     print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
     print "Test Accuracy  :: ", accuracy_score(test_y, y_pred)
 
     print "Elapsed time of diadoxika: ", time.time() - start_time_diadox
-
 
     # PipeLine.
     start_time_pipeline = time.time()
@@ -148,10 +156,10 @@ if __name__ == '__main__':
         ('vect', CountVectorizer(stop_words)),
         ('tfidf', TfidfTransformer()),
         # ('tfidf_v', TfidfVectorizer(stop_words)),
-        # ('lsa', TruncatedSVD(n_components=100)),
-        # ('scaler', MaxAbsScaler()),
+        ('lsa', TruncatedSVD(n_components=100)),
         ('norm', Normalizer(norm="l2", copy=True)),
-        ('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True))
+        ('clf', svm.SVC(kernel='linear', C=1.0))
+        # ('clf', svm.SVC(kernel='rbf', C=1.0, gamma='auto'))
     ])
 
     predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
@@ -162,3 +170,9 @@ if __name__ == '__main__':
     print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
 
     print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
+
+    print 'svmClassifier finished!\n'
+
+
+if __name__ == '__main__':
+    svm_classifier()
