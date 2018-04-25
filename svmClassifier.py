@@ -1,12 +1,14 @@
 # from sklearn.cross_validation import train_test_split
+import time
+
 from sklearn.decomposition import TruncatedSVD
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfTransformer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfTransformer, TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import svm
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn import preprocessing
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 import pandas as pd
 from sklearn.preprocessing import Normalizer
@@ -65,17 +67,16 @@ if __name__ == '__main__':
     train_data = pd.read_csv('train_set.csv', sep="\t")
     test_data = pd.read_csv('test_set.csv', sep="\t")
 
-    #print(headers[2:4])
+    # print(headers[2:4])
 
-    #Split dataSet to 70-30.
+    # Split dataSet to 70-30.
     train_x, test_x, train_y, test_y = split_dataset(train_data, 0.7, headers[2:4], headers[-1])
 
-    #LE
+    # LE
     le = preprocessing.LabelEncoder()
-    le.fit(train_data["Category"])
-    y = le.transform(train_data["Category"])
+    y = le.fit_transform(train_data["Category"])
 
-    #print 'y : ', set(y)
+    # print 'y : ', set(y)
 
     # Train and Test dataset size details
     print "Train_x Shape :: ", train_x.shape
@@ -92,30 +93,78 @@ if __name__ == '__main__':
 
     addPreDefinedStopWords()
 
-    #print train_x['Content'][1]
+    # print train_x['Content'][1]
 
-    #CV
+    start_time_diadox = time.time()
+
+    # Count Vectorizer
     count_vectorizer = CountVectorizer(stop_words)
     vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
     vectorTest = count_vectorizer.transform(test_x['Content'])
-
     print "VectorTrain shape::", vectorTrain.shape
     print "VectorTest shape::", vectorTest.shape
 
-    #LSA
+    # TfidfTransformer
+    tfidf = TfidfTransformer()
+    vectorTrain = tfidf.fit_transform(vectorTrain)
+    vectorTest = tfidf.transform(vectorTest)
+
+    # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
+    # tfidf_v = TfidfVectorizer(stop_words)
+    # vectorTrain = tfidf_v.fit_transform(train_x['Content'])
+    # vectorTest = tfidf_v.transform(test_x['Content'])
+
+    # LSA
     lsa = TruncatedSVD(n_components=100)
     vectorTrain = lsa.fit_transform(vectorTrain)
     vectorTest = lsa.transform(vectorTest)
 
-    print "VectorTrain shape::", vectorTrain.shape
-    print "VectorTest shape::", vectorTest.shape
+    print "VectorTrain shape after LSA::", vectorTrain.shape
+    print "VectorTest shape after LSA::", vectorTest.shape
 
-    #CLF
+    # Normalizer
+    norm = Normalizer(norm="l2", copy=True)
+    vectorTrain = norm.fit_transform(vectorTrain)
+    vectorTest = norm.transform(vectorTest)
+
+    # CLF
     clf = svm.SVC(kernel='linear', C=1.0)
-    #clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
+    # clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
+
+    # GridSearch (find the best parameters)
+    # parameters = {'kernel': ('linear', 'rbf'), 'C': [1.5, 10], 'gamma': [0, 'auto']}
+    # svr = svm.SVC()
+    # clf = GridSearchCV(svr, parameters)
 
     clf.fit(vectorTrain, train_y)
     y_pred = clf.predict(vectorTest)
 
+    # Best GridSearch params
+    #print clf.best_params_
+
     print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
     print "Test Accuracy  :: ", accuracy_score(test_y, y_pred)
+
+    print "Elapsed time of diadoxika: ", time.time() - start_time_diadox
+
+    # PipeLine.
+    start_time_pipeline = time.time()
+
+    pipeline = Pipeline([
+        ('vect', CountVectorizer(stop_words)),
+        ('tfidf', TfidfTransformer()),
+        # ('tfidf_v', TfidfVectorizer(stop_words)),
+        ('lsa', TruncatedSVD(n_components=100)),
+        ('norm', Normalizer(norm="l2", copy=True)),
+        ('clf', svm.SVC(kernel='linear', C=1.0))
+        # ('clf', svm.SVC(kernel='rbf', C=1.0, gamma='auto'))
+    ])
+
+    predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
+    # Now evaluate all steps on test set
+    predicted_test = pipeline.predict(test_x['Content'])
+
+    print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
+    print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
+
+    print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
