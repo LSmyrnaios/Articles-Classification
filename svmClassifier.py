@@ -67,8 +67,10 @@ if __name__ == '__main__':
 
     #print(headers[2:4])
 
+    #Split dataSet to 70-30.
     train_x, test_x, train_y, test_y = split_dataset(train_data, 0.7, headers[2:4], headers[-1])
 
+    #LE
     le = preprocessing.LabelEncoder()
     le.fit(train_data["Category"])
     y = le.transform(train_data["Category"])
@@ -92,26 +94,27 @@ if __name__ == '__main__':
 
     #print train_x['Content'][1]
 
+    #CV
     count_vectorizer = CountVectorizer(stop_words)
     vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
     vectorTest = count_vectorizer.transform(test_x['Content'])
 
-    #clf = svm.SVC(kernel='linear', C=1.0)
-    clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
-
     print "VectorTrain shape::", vectorTrain.shape
     print "VectorTest shape::", vectorTest.shape
 
+    #LSA
     lsa = TruncatedSVD(n_components=100)
-
     vectorTrain = lsa.fit_transform(vectorTrain)
     vectorTest = lsa.transform(vectorTest)
 
     print "VectorTrain shape::", vectorTrain.shape
     print "VectorTest shape::", vectorTest.shape
 
-    clf.fit(vectorTrain, train_y)
+    #CLF
+    clf = svm.SVC(kernel='linear', C=1.0)
+    #clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
 
+    clf.fit(vectorTrain, train_y)
     y_pred = clf.predict(vectorTest)
 
     print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
