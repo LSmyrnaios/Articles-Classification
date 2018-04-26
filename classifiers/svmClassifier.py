@@ -1,6 +1,6 @@
 # from sklearn.cross_validation import train_test_split
 import time
-
+from sklearn.model_selection import train_test_split
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score
 from sklearn import preprocessing
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
-from supportFuncs import stopWords, readDatasets, splitDataSet, crossValidation
+from supportFuncs import stopWords, readDatasets, crossValidation
 
 
 def svm_classifier(stop_words, train_data, test_data, use_pipeline):
@@ -19,8 +19,8 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
     # print(headers[2:4]) #DEBUG!
 
-    # Split dataSet to 70-30.
-    train_x, test_x, train_y, test_y = splitDataSet.split_dataset(train_data, 0.7, headers[2:4], headers[-1])
+    # Split train_dataset into 0.7% train and .03% test.
+    train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]], train_size=0.7, test_size=0.3)
 
     # LE (currently not used..)
     # le = preprocessing.LabelEncoder()
