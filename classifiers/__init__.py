@@ -9,7 +9,7 @@ def run_all_classifiers(stop_words, train_data, test_data, use_pipeline):
     nbScores = nbClassifier.nb_classifier(stop_words, train_data, test_data, use_pipeline)
     rfScores = rfClassifier.rf_classifier(stop_words, train_data, test_data, use_pipeline)
     svmScores = svmClassifier.svm_classifier(stop_words, train_data, test_data, use_pipeline)
-    #     knnScores = knnClassifier.knn_classifier(stop_words, train_data, test_data, use_pipeline)
+    # knnScores = knnClassifier.knn_classifier(stop_words, train_data, test_data, use_pipeline)
     # mymethodScores = mymethodClassifier.mymethod_classifier(stop_words, train_data, test_data, use_pipeline)
 
     # Open an outputCsvFile and write the scores which we will recieve from the classifiers.

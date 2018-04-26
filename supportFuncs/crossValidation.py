@@ -1,11 +1,14 @@
 from sklearn.model_selection import cross_validate
+import multiprocessing
+
 import numpy as np
 
 
 def get_scores_from_cross_validation(clf, vector_train, train_y):
 
     scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
-    predicted = cross_validate(clf, vector_train, train_y, cv=5, scoring=scoring, return_train_score=False)
+    predicted = cross_validate(clf, vector_train, train_y, cv=10, n_jobs=multiprocessing.cpu_count(), scoring=scoring, return_train_score=False)
+
     # print("Accuracy: %0.2f (+/- %0.2f)" % (predicted.mean(), predicted.std() * 2))
     # print sorted(predicted.keys())
 
