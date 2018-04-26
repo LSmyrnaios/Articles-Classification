@@ -22,7 +22,7 @@ def run_all_classifiers(stop_words, use_pipeline):
     print 'Writing classifiers\' scores to the outputCsvFile...\n'
 
     with open('Resources/csv/EvaluationMetric_10fold.csv', 'wb') as csvfile:
-        csvWriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        csvWriter = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
         # Write the Headers (first row & column).
         csvWriter.writerow(['StatisticMeasure'] + ['NaiveBayes'] + ['Random Forest'] + ['SVM'] + ['KNN'] + ['My Method'])

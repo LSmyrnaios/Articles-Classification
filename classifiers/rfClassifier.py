@@ -35,10 +35,10 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
     print "Train_x colums ::", train_x.columns
 
     for row in train_data:
-        train_x['Content'] += 5 * train_x['Title']
+        train_x['Content'] += train_x['Title']
 
     for row in test_data:
-        test_x['Content'] += 5 * test_x['Title']
+        test_x['Content'] += test_x['Title']
 
     # print train_x['Content'][1] #DEBUG!
 
@@ -107,6 +107,7 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
         # CLF
         clf = RandomForestClassifier(n_estimators=100)
 
+        print 'Running crossValidation on RandomForest...'
         scores = crossValidation.get_scores_from_cross_validation(clf, vectorTrain, train_y)
 
         # GridSearch
@@ -116,7 +117,7 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
 
         # clf.fit(vectorTrain, train_y)
         # y_pred = clf.predict(vectorTest)
-
+        #
         # print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
         # print "Test Accuracy :: ", accuracy_score(test_y, y_pred)
 

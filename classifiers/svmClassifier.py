@@ -35,10 +35,10 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
     print "Train_x colums ::", train_x.columns
 
     for row in train_data:
-        train_x['Content'] += 5 * train_x['Title']
+        train_x['Content'] += train_x['Title']
 
     for row in test_data:
-        test_x['Content'] += 5 * test_x['Title']
+        test_x['Content'] += test_x['Title']
 
     # print train_x['Content'][1] #DEBUG!
 
@@ -109,6 +109,7 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         clf = svm.SVC(kernel='linear', C=1.0)
         # clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
 
+        print 'Running crossValidation on SVM...'
         scores = crossValidation.get_scores_from_cross_validation(clf, vectorTrain, train_y)
 
         # GridSearch (find the best parameters)
