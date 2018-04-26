@@ -12,7 +12,7 @@ from sklearn.preprocessing import Normalizer
 from supportFuncs import stopWords, splitDataSet, crossValidation
 
 
-def nb_classifier(use_pipeline):
+def nb_classifier(stop_words, use_pipeline):
 
     print 'Running nbClassifier...\n'
 
@@ -21,14 +21,14 @@ def nb_classifier(use_pipeline):
     train_data = pd.read_csv('Resources/csv/train_set.csv', sep="\t")
     test_data = pd.read_csv('Resources/csv/test_set.csv', sep="\t")
 
-    #print(headers[2:4])
+    # print(headers[2:4]) #DEBUG!
 
     train_x, test_x, train_y, test_y = splitDataSet.split_dataset(train_data, 0.7, headers[2:4], headers[-1])
 
     le = preprocessing.LabelEncoder()
     y = le.fit_transform(train_data["Category"])
 
-    #print 'y : ', set(y)
+    # print 'y : ', set(y) #DEBUG!
 
     # Train and Test dataset size details
     print "Train_x Shape :: ", train_x.shape
@@ -43,9 +43,7 @@ def nb_classifier(use_pipeline):
     for row in test_data:
         test_x['Content'] += 5 * test_x['Title']
 
-    stop_words = stopWords.get_stop_words()
-
-    # print train_x['Content'][1]
+    # print train_x['Content'][1] #DEBUG!
 
     # List to be returned later.
     scores = []
@@ -131,4 +129,4 @@ def nb_classifier(use_pipeline):
 # Run nbClassifier directly:
 if __name__ == '__main__':
     usePipeline = False
-    nb_classifier(usePipeline)
+    nb_classifier(stopWords.get_stop_words(), usePipeline)

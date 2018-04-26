@@ -16,7 +16,7 @@ def show_wordcloud(stop_words, data, title=None):
     ).generate(str(data)).to_file("Resources/csv/" + title + ".png")
 
 
-def my_wordcloud():
+def my_wordcloud(stop_words):
 
     print 'Running myWordcloud...\n'
 
@@ -44,8 +44,6 @@ def my_wordcloud():
             elif category == 'Technology':
                 technologyStr += row["Content"]
 
-    stop_words = stopWords.get_stop_words()
-
     show_wordcloud(stop_words, businessStr, 'Business')
     show_wordcloud(stop_words, politicsStr, 'Politics')
     show_wordcloud(stop_words, footballStr, 'Football')
@@ -57,4 +55,4 @@ def my_wordcloud():
 
 # Run myWordcloud directly:
 if __name__ == '__main__':
-    my_wordcloud()
+    my_wordcloud(stopWords.get_stop_words())

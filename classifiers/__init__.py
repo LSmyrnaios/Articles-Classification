@@ -1,16 +1,17 @@
 from classifiers import rfClassifier, svmClassifier, nbClassifier
+from supportFuncs import stopWords
 import csv
 
 
-def run_all_classifiers():
+def run_all_classifiers(stop_words):
     print 'Running the classifiers...\n'
     usePipeline = False
 
-    nbScores = nbClassifier.nb_classifier(usePipeline)
-    rfScores = rfClassifier.rf_classifier(usePipeline)
-    svmScores = svmClassifier.svm_classifier(usePipeline)
-    #     knnScores = knnClassifier.knn_classifier(usePipeline)
-    # mymethodScores = mymethodClassifier.mymethod_classifier(usePipeline)
+    nbScores = nbClassifier.nb_classifier(stop_words, usePipeline)
+    rfScores = rfClassifier.rf_classifier(stop_words, usePipeline)
+    svmScores = svmClassifier.svm_classifier(stop_words, usePipeline)
+    #     knnScores = knnClassifier.knn_classifier(stop_words, usePipeline)
+    # mymethodScores = mymethodClassifier.mymethod_classifier(stop_words, usePipeline)
 
     # Open an outputCsvFile and write the scores which we will recieve from the classifiers.
 
@@ -31,4 +32,4 @@ def run_all_classifiers():
 
 # Run all classifiers:
 if __name__ == '__main__':
-    run_all_classifiers()
+    run_all_classifiers(stopWords.get_stop_words())
