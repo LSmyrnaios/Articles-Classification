@@ -3,7 +3,12 @@ from supportFuncs import stopWords, readDatasets
 import csv
 
 
-def run_all_classifiers(stop_words, train_data, test_data, use_pipeline):
+def run_all_classifiers(stop_words, use_pipeline):
+
+    data = readDatasets.read_dataset()
+    train_data = data[0]
+    test_data = data[1]
+
     print 'Running the classifiers...\n'
 
     nbScores = nbClassifier.nb_classifier(stop_words, train_data, test_data, use_pipeline)
@@ -31,10 +36,5 @@ def run_all_classifiers(stop_words, train_data, test_data, use_pipeline):
 
 # Run all classifiers:
 if __name__ == '__main__':
-
-    data = readDatasets.read_dataset()
-    trainData = data[0]
-    testData = data[1]
     usePipeline = False
-
-    run_all_classifiers(stopWords.get_stop_words(), trainData, testData, usePipeline)
+    run_all_classifiers(stopWords.get_stop_words(), usePipeline)
