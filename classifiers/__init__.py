@@ -2,8 +2,7 @@ from classifiers import rfClassifier, svmClassifier, nbClassifier
 import csv
 
 
-if __name__ == '__main__':
-
+def run_all_classifiers():
     print 'Running the classifiers...\n'
     usePipeline = False
 
@@ -28,3 +27,8 @@ if __name__ == '__main__':
         csvWriter.writerow(['F-Measure'] + [nbScores[3]] + [rfScores[3]] + [svmScores[3]] )  # + [knnScores[3]]] + [mymethodScores[3]])
 
     print 'Finished writing to the outputCsvFile!'
+
+
+# Run all classifiers:
+if __name__ == '__main__':
+    run_all_classifiers()

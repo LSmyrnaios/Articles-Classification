@@ -1,40 +1,10 @@
 # coding=utf-8
 from wordcloud import WordCloud
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+from supportFuncs import stopWords
 import csv
 
-stop_words = set(ENGLISH_STOP_WORDS)
 
-def addPreDefinedStopWords():
-    stop_words.add('said')
-    stop_words.add('he')
-    stop_words.add('He')
-    stop_words.add('it')
-    stop_words.add('It')
-    stop_words.add('got')
-    stop_words.add("don't")
-    stop_words.add('like')
-    stop_words.add("didn't")
-    stop_words.add('ago')
-    stop_words.add('went')
-    stop_words.add('did')
-    stop_words.add('day')
-    stop_words.add('just')
-    stop_words.add('thing')
-    stop_words.add('think')
-    stop_words.add('say')
-    stop_words.add('says')
-    stop_words.add('know')
-    stop_words.add('clear')
-    stop_words.add('despite')
-    stop_words.add('going')
-    stop_words.add('time')
-    stop_words.add('people')
-    stop_words.add('way')
-    # TODO - Add more stopWords..
-
-
-def show_wordcloud(data, title=None):
+def show_wordcloud(stop_words, data, title=None):
     print("Creating wordcloud \"" + title + '\" img...')
     wordcloud = WordCloud(
         background_color='black',
@@ -74,16 +44,17 @@ def my_wordcloud():
             elif category == 'Technology':
                 technologyStr += row["Content"]
 
-    addPreDefinedStopWords()
+    stop_words = stopWords.get_stop_words()
 
-    show_wordcloud(businessStr, 'Business')
-    show_wordcloud(politicsStr, 'Politics')
-    show_wordcloud(footballStr, 'Football')
-    show_wordcloud(filmStr, 'Film')
-    show_wordcloud(technologyStr, 'Technology')
+    show_wordcloud(stop_words, businessStr, 'Business')
+    show_wordcloud(stop_words, politicsStr, 'Politics')
+    show_wordcloud(stop_words, footballStr, 'Football')
+    show_wordcloud(stop_words, filmStr, 'Film')
+    show_wordcloud(stop_words, technologyStr, 'Technology')
 
     print 'myWordcloud finished!\n'
 
 
+# Run myWordcloud directly:
 if __name__ == '__main__':
     my_wordcloud()

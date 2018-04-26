@@ -1,66 +1,18 @@
 # from sklearn.cross_validation import train_test_split
 import time
 
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfTransformer, TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score
 from sklearn import preprocessing
-from sklearn.model_selection import train_test_split, GridSearchCV, cross_validate
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import Normalizer
+from supportFuncs import stopWords, splitDataSet, crossValidation
 
 
-stop_words = set(ENGLISH_STOP_WORDS)
-
-def addPreDefinedStopWords():
-    stop_words.add('said')
-    stop_words.add('he')
-    stop_words.add('He')
-    stop_words.add('it')
-    stop_words.add('It')
-    stop_words.add('got')
-    stop_words.add("don't")
-    stop_words.add('like')
-    stop_words.add("didn't")
-    stop_words.add('ago')
-    stop_words.add('went')
-    stop_words.add('did')
-    stop_words.add('day')
-    stop_words.add('just')
-    stop_words.add('thing')
-    stop_words.add('think')
-    stop_words.add('say')
-    stop_words.add('says')
-    stop_words.add('know')
-    stop_words.add('clear')
-    stop_words.add('despite')
-    stop_words.add('going')
-    stop_words.add('time')
-    stop_words.add('people')
-    stop_words.add('way')
-    # TODO - Add more stopWords...
-
-
-def split_dataset(dataset, train_percentage, feature_headers, target_header):
-    """
-    Split the dataset with train_percentage
-    :param dataset:
-    :param train_percentage:
-    :param feature_headers:
-    :param target_header:
-    :return: train_x, test_x, train_y, test_y
-    """
-
-    # Split dataset into train and test dataset
-    train_x, test_x, train_y, test_y = train_test_split(dataset[feature_headers], dataset[target_header],
-                                                        train_size=train_percentage, test_size=0.3)
-    return train_x, test_x, train_y, test_y
-
-
-def nb_classifier(usePipeline):
+def nb_classifier(use_pipeline):
 
     print 'Running nbClassifier...\n'
 
@@ -71,7 +23,7 @@ def nb_classifier(usePipeline):
 
     #print(headers[2:4])
 
-    train_x, test_x, train_y, test_y = split_dataset(train_data, 0.7, headers[2:4], headers[-1])
+    train_x, test_x, train_y, test_y = splitDataSet.split_dataset(train_data, 0.7, headers[2:4], headers[-1])
 
     le = preprocessing.LabelEncoder()
     y = le.fit_transform(train_data["Category"])
@@ -91,17 +43,14 @@ def nb_classifier(usePipeline):
     for row in test_data:
         test_x['Content'] += 5 * test_x['Title']
 
-    addPreDefinedStopWords()
+    stop_words = stopWords.get_stop_words()
 
     # print train_x['Content'][1]
 
-    # Values to be returned later.
-    predictedAccuracy = 0
-    predictedPercision = 0
-    predictedRecall = 0
-    predicedF_Measure = 0
+    # List to be returned later.
+    scores = []
 
-    if usePipeline:
+    if use_pipeline:
         print '\nRunning pipeline-version of nbClassifier...'
 
         # PipeLine.
@@ -123,7 +72,6 @@ def nb_classifier(usePipeline):
         print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
 
         print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
-
 
     else:
         print '\nRunning successional-version of nbClassifier...'
@@ -157,23 +105,7 @@ def nb_classifier(usePipeline):
         # CLF
         clf = MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)
 
-
-        scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
-        predicted = cross_validate(clf, vectorTrain, train_y, cv=5, scoring=scoring, return_train_score=False)
-        # print("Accuracy: %0.2f (+/- %0.2f)" % (predicted.mean(), predicted.std() * 2))
-        # print sorted(predicted.keys())
-
-        # Hold these values to be returned later.
-        predictedAccuracy = np.mean(predicted["test_accuracy"])
-        predictedPercision = np.mean(predicted["test_precision_macro"])
-        predictedRecall = np.mean(predicted["test_recall_macro"])
-        predicedF_Measure = np.mean(predicted["test_f1_macro"])
-
-        # DEBUG!
-        print "Accuracy: ", predictedAccuracy,\
-            "/ Precision: ", predictedPercision,\
-            "/ Recall: ", predictedRecall,\
-            "/ F-Measure: ", predicedF_Measure
+        scores = crossValidation.get_scores_from_cross_validation(clf, vectorTrain, train_y)
 
         # GridSearch
         # parameters = {'alpha': [10, 2, 1, 0.5, 0.1, 0.01, 0.001, 0.0001]}
@@ -189,13 +121,14 @@ def nb_classifier(usePipeline):
         # Best GridSearch params
         # print clf.best_params_
 
-        print "Elapsed time of diadoxika: ", time.time() - start_time_successional
+        print "Elapsed time of successional-run: ", time.time() - start_time_successional
 
 
     print 'nbClassifier finished!\n'
-    return [predictedAccuracy, predictedPercision, predictedRecall, predicedF_Measure]
+    return scores
 
 
+# Run nbClassifier directly:
 if __name__ == '__main__':
     usePipeline = False
     nb_classifier(usePipeline)
