@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score
 from sklearn import preprocessing
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
-from supportFuncs import stopWords, readDataset, splitDataSet, crossValidation
+from supportFuncs import stopWords, readDatasets, splitDataSet, crossValidation
 
 
 def rf_classifier(stop_words, train_data, test_data, use_pipeline):
@@ -132,7 +132,7 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
 # Run rfClassifier directly:
 if __name__ == '__main__':
 
-    data = readDataset.read_dataset()
+    data = readDatasets.read_dataset()
     trainData = data[0]
     testData = data[1]
     usePipeline = False

@@ -8,7 +8,7 @@ from sklearn import preprocessing
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
-from supportFuncs import stopWords, readDataset, splitDataSet, crossValidation
+from supportFuncs import stopWords, readDatasets, splitDataSet, crossValidation
 
 
 def nb_classifier(stop_words, train_data, test_data, use_pipeline):
@@ -124,7 +124,7 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
 # Run nbClassifier directly:
 if __name__ == '__main__':
 
-    data = readDataset.read_dataset()
+    data = readDatasets.read_dataset()
     trainData = data[0]
     testData = data[1]
     usePipeline = False

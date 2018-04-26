@@ -1,5 +1,5 @@
 from classifiers import rfClassifier, svmClassifier, nbClassifier
-from supportFuncs import stopWords, readDataset
+from supportFuncs import stopWords, readDatasets
 import csv
 
 
@@ -32,7 +32,7 @@ def run_all_classifiers(stop_words, train_data, test_data, use_pipeline):
 # Run all classifiers:
 if __name__ == '__main__':
 
-    data = readDataset.read_dataset()
+    data = readDatasets.read_dataset()
     trainData = data[0]
     testData = data[1]
     usePipeline = False

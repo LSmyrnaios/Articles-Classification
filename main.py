@@ -1,13 +1,13 @@
 from myWordcloud import my_wordcloud
 from classifiers.__init__ import run_all_classifiers
-from supportFuncs import stopWords, readDataset
+from supportFuncs import stopWords, readDatasets
 
 
 # Run everything:
 if __name__ == '__main__':
 
     stop_words = stopWords.get_stop_words()
-    data = readDataset.read_dataset()
+    data = readDatasets.read_dataset()
     trainData = data[0]
     testData = data[1]
     usePipeline = False
