@@ -7,27 +7,22 @@ from sklearn.metrics import accuracy_score
 from sklearn import preprocessing
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
-import pandas as pd
 from sklearn.preprocessing import Normalizer
-from supportFuncs import stopWords, splitDataSet, crossValidation
+from supportFuncs import stopWords, readDataset, splitDataSet, crossValidation
 
 
-def nb_classifier(stop_words, use_pipeline):
+def nb_classifier(stop_words, train_data, test_data, use_pipeline):
 
     print 'Running nbClassifier...\n'
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
-
-    train_data = pd.read_csv('Resources/csv/train_set.csv', sep="\t")
-    test_data = pd.read_csv('Resources/csv/test_set.csv', sep="\t")
-
     # print(headers[2:4]) #DEBUG!
 
     train_x, test_x, train_y, test_y = splitDataSet.split_dataset(train_data, 0.7, headers[2:4], headers[-1])
 
-    le = preprocessing.LabelEncoder()
-    y = le.fit_transform(train_data["Category"])
-
+    # LE (currently not used..)
+    # le = preprocessing.LabelEncoder()
+    # y = le.fit_transform(train_data["Category"])
     # print 'y : ', set(y) #DEBUG!
 
     # Train and Test dataset size details
@@ -128,5 +123,10 @@ def nb_classifier(stop_words, use_pipeline):
 
 # Run nbClassifier directly:
 if __name__ == '__main__':
+
+    data = readDataset.read_dataset()
+    trainData = data[0]
+    testData = data[1]
     usePipeline = False
-    nb_classifier(stopWords.get_stop_words(), usePipeline)
+
+    nb_classifier(stopWords.get_stop_words(), trainData, testData, usePipeline)

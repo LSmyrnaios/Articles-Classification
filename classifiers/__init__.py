@@ -1,17 +1,16 @@
 from classifiers import rfClassifier, svmClassifier, nbClassifier
-from supportFuncs import stopWords
+from supportFuncs import stopWords, readDataset
 import csv
 
 
-def run_all_classifiers(stop_words):
+def run_all_classifiers(stop_words, train_data, test_data, use_pipeline):
     print 'Running the classifiers...\n'
-    usePipeline = False
 
-    nbScores = nbClassifier.nb_classifier(stop_words, usePipeline)
-    rfScores = rfClassifier.rf_classifier(stop_words, usePipeline)
-    svmScores = svmClassifier.svm_classifier(stop_words, usePipeline)
-    #     knnScores = knnClassifier.knn_classifier(stop_words, usePipeline)
-    # mymethodScores = mymethodClassifier.mymethod_classifier(stop_words, usePipeline)
+    nbScores = nbClassifier.nb_classifier(stop_words, train_data, test_data, use_pipeline)
+    rfScores = rfClassifier.rf_classifier(stop_words, train_data, test_data, use_pipeline)
+    svmScores = svmClassifier.svm_classifier(stop_words, train_data, test_data, use_pipeline)
+    #     knnScores = knnClassifier.knn_classifier(stop_words, train_data, test_data, use_pipeline)
+    # mymethodScores = mymethodClassifier.mymethod_classifier(stop_words, train_data, test_data, use_pipeline)
 
     # Open an outputCsvFile and write the scores which we will recieve from the classifiers.
 
@@ -32,4 +31,10 @@ def run_all_classifiers(stop_words):
 
 # Run all classifiers:
 if __name__ == '__main__':
-    run_all_classifiers(stopWords.get_stop_words())
+
+    data = readDataset.read_dataset()
+    trainData = data[0]
+    testData = data[1]
+    usePipeline = False
+
+    run_all_classifiers(stopWords.get_stop_words(), trainData, testData, usePipeline)
