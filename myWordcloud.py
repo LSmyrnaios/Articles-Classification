@@ -13,14 +13,14 @@ def show_wordcloud(stop_words, data, title=None):
         max_font_size=40,
         scale=5,
         random_state=1
-    ).generate(str(data)).to_file("Resources/csv/" + title + ".png")
+    ).generate(str(data)).to_file("Resources/img/" + title + ".png")
 
 
 def my_wordcloud(stop_words):
 
     print 'Running myWordcloud...\n'
 
-    #print 'StopWords ', stop_words
+    # print 'StopWords ', stop_words
 
     businessStr = ''
     politicsStr = ''
