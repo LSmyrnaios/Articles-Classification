@@ -1,4 +1,3 @@
-# from sklearn.cross_validation import train_test_split
 import time
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import TruncatedSVD
@@ -6,10 +5,10 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-from sklearn import preprocessing
+# from sklearn import preprocessing
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
-from supportFuncs import stopWords, readDatasets, crossValidation
+from supportFuncs import stopWords, readDatasets, appendTitleToContentXtimes, crossValidation
 
 
 def rf_classifier(stop_words, train_data, test_data, use_pipeline):
@@ -19,7 +18,7 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
     # print(headers[2:4]) #DEBUG!
 
-    # Split train_dataset into 0.7% train and .03% test.
+    # Split train_dataset into 0.7% train and 0.3% test.
     train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]], train_size=0.7, test_size=0.3)
 
     # LE (currently not used..)
@@ -34,11 +33,7 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
     print "Test_y Shape :: ", test_y.shape
     print "Train_x colums ::", train_x.columns
 
-    for row in train_data:
-        train_x['Content'] += train_x['Title']
-
-    for row in test_data:
-        test_x['Content'] += test_x['Title']
+    train_x, test_x = appendTitleToContentXtimes.append_title_to_content_x_times(train_x, test_x, 1)
 
     # print train_x['Content'][1] #DEBUG!
 
