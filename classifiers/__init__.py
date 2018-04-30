@@ -26,6 +26,8 @@ def run_all_classifiers(stop_words, use_pipeline):
 
         # Write the Headers (first row & column).
         csvWriter.writerow(['StatisticMeasure'] + ['NaiveBayes'] + ['Random Forest'] + ['SVM'] + ['KNN'] + ['My Method'])
+
+        # Write the scores.
         csvWriter.writerow(['Accuracy'] + [nbScores[0]] + [rfScores[0]] + [svmScores[0]] )  # + [knnScores[0]] + [mymethodScores[0]])
         csvWriter.writerow(['Precision'] + [nbScores[1]] + [rfScores[1]] + [svmScores[1]] )  # + [knnScores[1]]] + [mymethodScores[1]])
         csvWriter.writerow(['Recall'] + [nbScores[2]] + [rfScores[2]] + [svmScores[2]] )  # + [knnScores[2]] + [mymethodScores[2]])

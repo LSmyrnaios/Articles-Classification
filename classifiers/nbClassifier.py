@@ -20,11 +20,6 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
     # Split train_dataset into 0.7% train and 0.3% test.
     train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]], train_size=0.7, test_size=0.3)
 
-    # LE (currently not used..)
-    # le = preprocessing.LabelEncoder()
-    # y = le.fit_transform(train_data["Category"])
-    # print 'y : ', set(y) #DEBUG!
-
     # Train and Test dataset size details
     print "Train_x Shape :: ", train_x.shape
     print "Train_y Shape :: ", train_y.shape
@@ -33,6 +28,11 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
     print "Train_x colums ::", train_x.columns
 
     train_x, test_x = appendTitleToContentXtimes.append_title_to_content_x_times(train_x, test_x, 1)
+
+    # LE
+    # le = preprocessing.LabelEncoder()
+    # train_x = le.fit_transform(train_x)
+    # test_x = le.fit(test_x)
 
     # print train_x['Content'][1] #DEBUG!
 
@@ -104,7 +104,7 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
 
         # clf.fit(vectorTrain, train_y)
         # y_pred = clf.predict(vectorTest)
-        #
+
         # print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
         # print "Test Accuracy :: ", accuracy_score(test_y, y_pred)
 

@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-# from sklearn import preprocessing
+from sklearn import preprocessing
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
 from supportFuncs import stopWords, readDatasets, appendTitleToContentXtimes, crossValidation
@@ -21,11 +21,6 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
     # Split train_dataset into 0.7% train and 0.3% test.
     train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]], train_size=0.7, test_size=0.3)
 
-    # LE (currently not used..)
-    # le = preprocessing.LabelEncoder()
-    # y = le.fit_transform(train_data["Category"])
-    # print 'y : ', set(y) #DEBUG!
-
     # Train and Test dataset size details
     print "Train_x Shape :: ", train_x.shape
     print "Train_y Shape :: ", train_y.shape
@@ -34,6 +29,11 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
     print "Train_x colums ::", train_x.columns
 
     train_x, test_x = appendTitleToContentXtimes.append_title_to_content_x_times(train_x, test_x, 1)
+
+    # LE
+    # le = preprocessing.LabelEncoder()
+    # train_x = le.fit_transform(train_x)
+    # test_x = le.fit(test_x)
 
     # print train_x['Content'][1] #DEBUG!
 
