@@ -11,47 +11,55 @@ from sklearn.preprocessing import Normalizer
 from supportFuncs import stopWords, readDatasets, appendTitleToContentXtimes, crossValidation
 
 
-def euklidianDist(x, xi):
-    dist = 0.0
-    for i in range(len(x)-1):
-        dist += pow((float(x[i])-float(xi[i])), 2)
-    dist = math.sqrt(dist)
-    return dist
+def euclideanDistance(instance1, instance2, length):
+    distance = 0
+    #print length
+    for x in range(length):
+        distance += pow((instance1[x] - instance2[x]), 2)
+    distance = math.sqrt(distance)
+    #print(distance)
+    return  distance
+
+def manhattan_distance(start, end):
+    return sum(abs(e - s) for s,e in zip(start, end))
 
 
-def knn_predict(train_data, test_data, k_value):
+def getNeighbors(trainingSet, testInstance, k, train_data):
+    distances = []
+    length = len(testInstance)
+    for x in range(len(trainingSet)):
+        #dist = euclideanDistance(testInstance, trainingSet[x], length)
+        dist = manhattan_distance(testInstance, trainingSet[x])
+        distances.append((trainingSet[x], dist, train_data['Category'][x]))
+        #print distances[x][1]
+    distances.sort(key=operator.itemgetter(1))
+    neighbors = []
+    for x in range(k):
+        #print '-------------------'
+        #print distances[x][1], distances[x][2]
+        neighbors.append((distances[x][0], distances[x][2]))
+    return neighbors
 
-    for i in test_data:
-        eu_Distance = []
-        knn = []
-        good = 0
-        bad = 0
-        for j in train_data:
-            eu_dist = euklidianDist(i, j)
-            eu_Distance.append((j[5], eu_dist))
-            eu_Distance.sort(key=operator.itemgetter(1))
-            knn = eu_Distance[:k_value]
-            for k in knn:
-                if k[0] == 'g':
-                    good += 1
-                else:
-                    bad += 1
-        if good > bad:
-            i.append('g')
-        elif good < bad:
-            i.append('b')
+
+def getResponse(neighbors):
+    classVotes = {}
+    for x in range(len(neighbors)):
+        response = neighbors[x][-1]
+        if response in classVotes:
+            classVotes[response] += 1
         else:
-            i.append('NaN')
+            classVotes[response] = 1
+    sortedVotes = sorted(classVotes.iteritems(), key=operator.itemgetter(1), reverse=True)
+    return sortedVotes[0][0]
 
 
-def accuracy(test_data):
+def getAccuracy(testSet, predictions):
     correct = 0
-    for i in test_data:
-        if i[5] == i[6]:
-            correct += 1
 
-    accuracy = float(correct) / len(test_data) * 100
-    return accuracy
+    for x in range(len(testSet)):
+        if testSet['Category'][-1] == predictions[x]:
+            correct += 1
+    return (correct / float(len(testSet))) * 100.0
 
 
 def knn_classifier(stop_words, train_data, test_data):  # It's uncertain if we will implement pipeline for knn..
@@ -59,10 +67,11 @@ def knn_classifier(stop_words, train_data, test_data):  # It's uncertain if we w
     print 'Running knnClassifier...\n'
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
-    # print(headers[2:4]) #DEBUG!
+    print(headers[2:4]) #DEBUG!
 
     # Split train_dataset into 0.7% train and .03% test.
-    train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]], train_size=0.7, test_size=0.3)
+    train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:5]], train_data[headers[-1]],
+                                                        train_size=0.7, test_size=0.3)
 
     # Train and Test dataset size details
     print "Train_x Shape :: ", train_x.shape
@@ -109,18 +118,33 @@ def knn_classifier(stop_words, train_data, test_data):  # It's uncertain if we w
     norm = Normalizer(norm="l2", copy=True)
     vectorTrain = norm.fit_transform(vectorTrain)
     vectorTest = norm.transform(vectorTest)
-
+    predictions = []
     # TODO - Implement the KNN.
-    kValue = randint(1, 10)  # Assumed K value
-    knn_predict(train_x, test_x, kValue)
-    print 'Accuracy: ', accuracy(test_data)
+    #kValue = randint(1, 10)  # Assumed K value
+    kValue=10
+    count=0
+    for x in range(100):
+        neighbors = getNeighbors(vectorTrain, vectorTest[x], kValue, train_data)
+        #print(neighbors)
+        result = getResponse(neighbors)
+        print result
+        predictions.append(result)
+        #print('> predicted=' + repr(result) + ', actual=' + repr(train_data['Category'][8586+x]))
+        if(result==train_data['Category'][8586+x]):
+            count+=1
+
+    #print 'Test', test_x[1:2], 'Pred', predictions[0]
+    #accuracy = getAccuracy(test_data, predictions)
+    #print('Accuracy: ' + repr(accuracy) + '%')
+    print("Got right", count, "out of", 100)
+
+    #crossValidation.get_scores_from_cross_validation(clf, vector_train, train_y)
 
     print "Elapsed time of successional-run: ", time.time() - start_time_successional
 
 
 # Run knnClassifier directly:
 if __name__ == '__main__':
-
     data = readDatasets.read_dataset()
     trainData = data[0]
     testData = data[1]
