@@ -1,4 +1,4 @@
-from classifiers import rfClassifier, svmClassifier, nbClassifier
+from classifiers import rfClassifier, svmClassifier, nbClassifier, MyMethodClassifier
 from supportFuncs import stopWords, readDatasets
 import csv
 
@@ -15,7 +15,7 @@ def run_all_classifiers(stop_words, use_pipeline):
     rfScores = rfClassifier.rf_classifier(stop_words, train_data, test_data, use_pipeline)
     svmScores = svmClassifier.svm_classifier(stop_words, train_data, test_data, use_pipeline)
     # knnScores = knnClassifier.knn_classifier(stop_words, train_data, test_data)
-    # mymethodScores = mymethodClassifier.mymethod_classifier(stop_words, train_data, test_data, use_pipeline)
+    mymethodScores = MyMethodClassifier.my_method_classifier(stop_words, train_data, test_data)
 
     # Open an outputCsvFile and write the scores which we will receive from the classifiers.
 
@@ -28,10 +28,10 @@ def run_all_classifiers(stop_words, use_pipeline):
         csvWriter.writerow(['StatisticMeasure'] + ['NaiveBayes'] + ['Random Forest'] + ['SVM'] + ['KNN'] + ['My Method'])
 
         # Write the scores.
-        csvWriter.writerow(['Accuracy'] + [nbScores[0]] + [rfScores[0]] + [svmScores[0]] )  # + [knnScores[0]] + [mymethodScores[0]])
-        csvWriter.writerow(['Precision'] + [nbScores[1]] + [rfScores[1]] + [svmScores[1]] )  # + [knnScores[1]]] + [mymethodScores[1]])
-        csvWriter.writerow(['Recall'] + [nbScores[2]] + [rfScores[2]] + [svmScores[2]] )  # + [knnScores[2]] + [mymethodScores[2]])
-        csvWriter.writerow(['F-Measure'] + [nbScores[3]] + [rfScores[3]] + [svmScores[3]] )  # + [knnScores[3]]] + [mymethodScores[3]])
+        csvWriter.writerow(['Accuracy'] + [nbScores[0]] + [rfScores[0]] + [svmScores[0]] + ['knn'] + [mymethodScores[0]] )  # + [knnScores[0]] + [mymethodScores[0]])
+        csvWriter.writerow(['Precision'] + [nbScores[1]] + [rfScores[1]] + [svmScores[1]] + ['knn'] + [mymethodScores[1]] )  # + [knnScores[1]]] + [mymethodScores[1]])
+        csvWriter.writerow(['Recall'] + [nbScores[2]] + [rfScores[2]] + [svmScores[2]] + ['knn'] + [mymethodScores[2]] )  # + [knnScores[2]] + [mymethodScores[2]])
+        csvWriter.writerow(['F-Measure'] + [nbScores[3]] + [rfScores[3]] + [svmScores[3]] + ['knn'] + [mymethodScores[3]] )  # + [knnScores[3]]] + [mymethodScores[3]])
 
     print 'Finished writing to the outputCsvFile!'
 

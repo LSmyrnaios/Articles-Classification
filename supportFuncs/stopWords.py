@@ -36,6 +36,16 @@ def add_and_return_stop_words():
     stop_words.add("I'd")
     stop_words.add('does')
     stop_words.add("doesn't")
+    stop_words.add('week')
+    stop_words.add('year')
+    stop_words.add('Year')
+    stop_words.add("Year's")
+    stop_words.add('years')
+    stop_words.add('want')
+    stop_words.add('make')
+    stop_words.add('come')
+    stop_words.add('came')
+    stop_words.add('new')
     # TODO - Add more stopWords..
     return stop_words
 

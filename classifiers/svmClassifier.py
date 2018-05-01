@@ -119,7 +119,7 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         # print "Test Accuracy :: ", accuracy_score(test_y, y_pred)
 
         # Best GridSearch params
-        #print clf.best_params_
+        # print clf.best_params_
 
         print "Elapsed time of successional-run: ", time.time() - start_time_successional
 

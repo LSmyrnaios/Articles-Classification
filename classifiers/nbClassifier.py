@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score
+import numpy as np
 # from sklearn import preprocessing
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
@@ -53,12 +54,17 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
             ('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True))
         ])
 
-        predicted_train = pipeline.fit(train_x['Content'], train_y).predict(train_x['Content'])
+        pipeline = pipeline.fit(train_x['Content'], train_y)
+        #accuracies = []
+        # for i in range(10):
+        predicted_train = pipeline.predict(train_x['Content'])
         # Now evaluate all steps on test set
         predicted_test = pipeline.predict(test_x['Content'])
-
         print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
         print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
+        #accuracies.append(accuracy_score(test_y, predicted_test))
+
+        #print 'CrossValidation mean accuracy: ', np.mean(accuracies)
 
         print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
 
