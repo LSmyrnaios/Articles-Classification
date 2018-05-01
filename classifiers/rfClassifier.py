@@ -48,10 +48,10 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
 
         pipeline = Pipeline([
             ('vect', CountVectorizer(stop_words)),
-            ('tfidf', TfidfTransformer()),
+            # ('tfidf', TfidfTransformer()),
             # ('tfidf_v', TfidfVectorizer(stopWords)),
             ('lsa', TruncatedSVD(n_components=100)),
-            ('norm', Normalizer(norm="l2", copy=True)),
+            # ('norm', Normalizer(norm="l2", copy=True)),
             ('clf', RandomForestClassifier(n_estimators=100))
         ])
 
@@ -77,9 +77,9 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
         print "VectorTest shape::", vectorTest.shape
 
         # TfidfTransformer
-        tfidf = TfidfTransformer()
-        vectorTrain = tfidf.fit_transform(vectorTrain)
-        vectorTest = tfidf.transform(vectorTest)
+        # tfidf = TfidfTransformer()
+        # vectorTrain = tfidf.fit_transform(vectorTrain)
+        # vectorTest = tfidf.transform(vectorTest)
 
         # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
         # tfidf_v = TfidfVectorizer(stopWords)
@@ -95,9 +95,9 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
         print "VectorTest shape after LSA::", vectorTest.shape
 
         # Normalizer
-        norm = Normalizer(norm="l2", copy=True)
-        vectorTrain = norm.fit_transform(vectorTrain)
-        vectorTest = norm.transform(vectorTest)
+        # norm = Normalizer(norm="l2", copy=True)
+        # vectorTrain = norm.fit_transform(vectorTrain)
+        # vectorTest = norm.transform(vectorTest)
 
         # CLF
         clf = RandomForestClassifier(n_estimators=100)

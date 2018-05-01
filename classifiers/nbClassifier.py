@@ -47,9 +47,9 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
 
         pipeline = Pipeline([
             ('vect', CountVectorizer(stop_words)),
-            ('tfidf', TfidfTransformer()),
+            # ('tfidf', TfidfTransformer()),
             # ('tfidf_v', TfidfVectorizer(stop_words)),
-            ('norm', Normalizer(norm="l2", copy=True)),
+            # ('norm', Normalizer(norm="l2", copy=True)),
             ('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True))
         ])
 
@@ -75,9 +75,9 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
         print "VectorTest shape::", vectorTest.shape
 
         # TfidfTransformer
-        tfidf = TfidfTransformer()
-        vectorTrain = tfidf.fit_transform(vectorTrain)
-        vectorTest = tfidf.transform(vectorTest)
+        # tfidf = TfidfTransformer()
+        # vectorTrain = tfidf.fit_transform(vectorTrain)
+        # vectorTest = tfidf.transform(vectorTest)
 
         # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
         # tfidf_v = TfidfVectorizer(stop_words)
@@ -87,9 +87,9 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
         # Here we don't use LSA, as it has some issues (negative numbers).
 
         # Normalizer
-        norm = Normalizer(norm="l2", copy=True)
-        vectorTrain = norm.fit_transform(vectorTrain)
-        vectorTest = norm.transform(vectorTest)
+        # norm = Normalizer(norm="l2", copy=True)
+        # vectorTrain = norm.fit_transform(vectorTrain)
+        # vectorTest = norm.transform(vectorTest)
 
         # CLF
         clf = MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)

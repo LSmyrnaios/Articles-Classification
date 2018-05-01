@@ -48,10 +48,10 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
 
         pipeline = Pipeline([
             ('vect', CountVectorizer(stop_words)),
-            ('tfidf', TfidfTransformer()),
+            # ('tfidf', TfidfTransformer()),
             # ('tfidf_v', TfidfVectorizer(stop_words)),
             ('lsa', TruncatedSVD(n_components=100)),
-            ('norm', Normalizer(norm="l2", copy=True)),
+            # ('norm', Normalizer(norm="l2", copy=True)),
             ('clf', svm.SVC(kernel='linear', C=1.0))
             # ('clf', svm.SVC(kernel='rbf', C=1.0, gamma='auto'))
         ])
@@ -78,9 +78,9 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         print "VectorTest shape::", vectorTest.shape
 
         # TfidfTransformer
-        tfidf = TfidfTransformer()
-        vectorTrain = tfidf.fit_transform(vectorTrain)
-        vectorTest = tfidf.transform(vectorTest)
+        # tfidf = TfidfTransformer()
+        # vectorTrain = tfidf.fit_transform(vectorTrain)
+        # vectorTest = tfidf.transform(vectorTest)
 
         # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
         # tfidf_v = TfidfVectorizer(stopWords)
@@ -96,9 +96,9 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         print "VectorTest shape after LSA::", vectorTest.shape
 
         # Normalizer
-        norm = Normalizer(norm="l2", copy=True)
-        vectorTrain = norm.fit_transform(vectorTrain)
-        vectorTest = norm.transform(vectorTest)
+        # norm = Normalizer(norm="l2", copy=True)
+        # vectorTrain = norm.fit_transform(vectorTrain)
+        # vectorTest = norm.transform(vectorTest)
 
         # CLF
         clf = svm.SVC(kernel='linear', C=1.0)
