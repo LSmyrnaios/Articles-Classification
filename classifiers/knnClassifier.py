@@ -55,7 +55,6 @@ def getResponse(neighbors):
 
 def getAccuracy(testSet, predictions):
     correct = 0
-
     for x in range(len(testSet)):
         if testSet['Category'][-1] == predictions[x]:
             correct += 1
@@ -97,9 +96,9 @@ def knn_classifier(stop_words, train_data, test_data):  # It's uncertain if we w
     print "VectorTest shape::", vectorTest.shape
 
     # TfidfTransformer
-    tfidf = TfidfTransformer()
-    vectorTrain = tfidf.fit_transform(vectorTrain)
-    vectorTest = tfidf.transform(vectorTest)
+    # tfidf = TfidfTransformer()
+    # vectorTrain = tfidf.fit_transform(vectorTrain)
+    # vectorTest = tfidf.transform(vectorTest)
 
     # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
     # tfidf_v = TfidfVectorizer(stopWords)
@@ -115,30 +114,35 @@ def knn_classifier(stop_words, train_data, test_data):  # It's uncertain if we w
     print "VectorTest shape after LSA::", vectorTest.shape
 
     # Normalizer
-    norm = Normalizer(norm="l2", copy=True)
-    vectorTrain = norm.fit_transform(vectorTrain)
-    vectorTest = norm.transform(vectorTest)
+    # norm = Normalizer(norm="l2", copy=True)
+    # vectorTrain = norm.fit_transform(vectorTrain)
+    # vectorTest = norm.transform(vectorTest)
+
     predictions = []
-    # TODO - Implement the KNN.
-    #kValue = randint(1, 10)  # Assumed K value
-    kValue=10
-    count=0
+    # accuracies = []
+    # kValue = randint(1, 10)  # Assumed K value
+    kValue = 10
+    count = 0
+
+    # for i in range(10):  # 10-fold-validation
     for x in range(100):
         neighbors = getNeighbors(vectorTrain, vectorTest[x], kValue, train_data)
-        #print(neighbors)
+        # print(neighbors)
         result = getResponse(neighbors)
-        print result
+        # print result
         predictions.append(result)
-        #print('> predicted=' + repr(result) + ', actual=' + repr(train_data['Category'][8586+x]))
-        if(result==train_data['Category'][8586+x]):
-            count+=1
+        # print('> predicted=' + repr(result) + ', actual=' + repr(train_data['Category'][8586+x]))
+        if result == train_data['Category'][8586+x]:
+            count += 1
 
-    #print 'Test', test_x[1:2], 'Pred', predictions[0]
-    #accuracy = getAccuracy(test_data, predictions)
-    #print('Accuracy: ' + repr(accuracy) + '%')
+    # print 'Test', test_x[1:2], 'Pred', predictions[0]
+    # accuracies.append(getAccuracy(test_data, predictions))
+    # print('Accuracy: ' + repr(accuracy) + '%')
     print("Got right", count, "out of", 100)
 
-    #crossValidation.get_scores_from_cross_validation(clf, vector_train, train_y)
+    # Final accuracy after crossValidation
+    # print accuracies
+    # print np.mean(accuracies)
 
     print "Elapsed time of successional-run: ", time.time() - start_time_successional
 
