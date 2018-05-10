@@ -191,7 +191,7 @@ ID	Predicted_Category
 1026	Business
 1032	Business
 1047	Politics
-1050	Politics
+1050	Business
 1059	Business
 1061	Business
 1062	Business
@@ -389,7 +389,7 @@ ID	Predicted_Category
 2079	Football
 2081	Technology
 2083	Technology
-2086	Technology
+2086	Business
 2100	Politics
 2101	Politics
 2103	Politics
@@ -409,7 +409,7 @@ ID	Predicted_Category
 2168	Politics
 2172	Film
 2181	Film
-2191	Football
+2191	Business
 2192	Film
 2193	Film
 2198	Film
@@ -528,7 +528,7 @@ ID	Predicted_Category
 2702	Business
 2704	Technology
 2706	Technology
-2722	Politics
+2722	Business
 2732	Technology
 2735	Business
 2736	Politics
@@ -720,7 +720,7 @@ ID	Predicted_Category
 3582	Politics
 3594	Technology
 3607	Technology
-3614	Technology
+3614	Film
 3630	Technology
 3636	Technology
 3638	Technology
@@ -849,7 +849,7 @@ ID	Predicted_Category
 4200	Technology
 4213	Technology
 4222	Technology
-4223	Technology
+4223	Business
 4230	Technology
 4235	Technology
 4236	Technology
@@ -1158,7 +1158,7 @@ ID	Predicted_Category
 5679	Film
 5683	Film
 5689	Film
-5692	Technology
+5692	Film
 5693	Film
 5694	Film
 5700	Film
@@ -1302,7 +1302,7 @@ ID	Predicted_Category
 6347	Business
 6350	Business
 6352	Football
-6356	Technology
+6356	Business
 6357	Technology
 6358	Film
 6381	Film
@@ -1569,7 +1569,7 @@ ID	Predicted_Category
 7764	Politics
 7765	Politics
 7770	Football
-7772	Politics
+7772	Business
 7773	Politics
 7774	Politics
 7777	Politics
@@ -1609,7 +1609,7 @@ ID	Predicted_Category
 7960	Business
 7964	Business
 7968	Politics
-7973	Technology
+7973	Business
 7975	Business
 7978	Business
 7982	Business
@@ -1735,7 +1735,7 @@ ID	Predicted_Category
 8583	Politics
 8590	Politics
 8595	Politics
-8597	Politics
+8597	Business
 8599	Politics
 8611	Politics
 8614	Politics
@@ -1892,7 +1892,7 @@ ID	Predicted_Category
 9359	Film
 9360	Film
 9361	Film
-9364	Film
+9364	Technology
 9368	Film
 9380	Film
 9385	Film
@@ -1919,7 +1919,7 @@ ID	Predicted_Category
 9543	Film
 9545	Film
 9546	Film
-9550	Business
+9550	Politics
 9567	Film
 9572	Film
 9580	Film
@@ -1949,7 +1949,7 @@ ID	Predicted_Category
 9658	Film
 9662	Film
 9677	Film
-9679	Technology
+9679	Film
 9682	Film
 9685	Film
 9697	Film
@@ -2170,7 +2170,7 @@ ID	Predicted_Category
 10834	Football
 10837	Politics
 10844	Football
-10854	Business
+10854	Politics
 10856	Football
 10858	Technology
 10861	Politics
@@ -2250,7 +2250,7 @@ ID	Predicted_Category
 11297	Business
 11302	Politics
 11307	Politics
-11308	Politics
+11308	Business
 11315	Politics
 11316	Politics
 11319	Politics
@@ -2270,7 +2270,7 @@ ID	Predicted_Category
 11405	Politics
 11419	Politics
 11439	Business
-11447	Politics
+11447	Business
 11448	Business
 11451	Politics
 11458	Politics
@@ -2425,7 +2425,7 @@ ID	Predicted_Category
 12223	Technology
 12226	Football
 12228	Football
-12229	Film
+12229	Football
 12240	Technology
 12241	Football
 12256	Football
@@ -2434,7 +2434,7 @@ ID	Predicted_Category
 12277	Football
 12279	Football
 12283	Football
-12284	Technology
+12284	Business
 12286	Technology
 12295	Football
 12307	Football
@@ -2556,7 +2556,7 @@ ID	Predicted_Category
 12909	Film
 12913	Business
 12916	Film
-12920	Politics
+12920	Film
 12922	Film
 12934	Film
 12940	Film
@@ -2825,7 +2825,7 @@ ID	Predicted_Category
 14282	Politics
 14288	Politics
 14289	Politics
-14290	Film
+14290	Technology
 14300	Business
 14304	Business
 14309	Business
@@ -2948,7 +2948,7 @@ ID	Predicted_Category
 14743	Politics
 14746	Business
 14748	Politics
-14750	Film
+14750	Business
 14755	Film
 14756	Film
 14762	Politics
@@ -2986,7 +2986,7 @@ ID	Predicted_Category
 14891	Politics
 14892	Business
 14899	Business
-14900	Film
+14900	Business
 14916	Business
 14934	Football
 14939	Football

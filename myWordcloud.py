@@ -6,7 +6,7 @@ import csv
 
 def show_wordcloud(stop_words, data, title=None):
     print("Creating wordcloud \"" + title + '\" img...')
-    wordcloud = WordCloud(
+    WordCloud(
         background_color='black',
         stopwords=stop_words,
         max_words=200,
@@ -17,8 +17,7 @@ def show_wordcloud(stop_words, data, title=None):
 
 
 def my_wordcloud(stop_words):
-
-    print 'Running myWordcloud...\n'
+    print('Running myWordcloud...\n')
 
     # print 'StopWords ', stop_words
 
@@ -28,7 +27,7 @@ def my_wordcloud(stop_words):
     filmStr = ''
     technologyStr = ''
 
-    with open('Resources/csv/train_set.csv', 'rb') as csvfile:
+    with open('Resources/csv/train_set.csv', mode='r', encoding="utf8") as csvfile:
         csvReader = csv.DictReader(csvfile, delimiter='\t', quotechar='|')
 
         for row in csvReader:
@@ -50,7 +49,7 @@ def my_wordcloud(stop_words):
     show_wordcloud(stop_words, filmStr, 'Film')
     show_wordcloud(stop_words, technologyStr, 'Technology')
 
-    print 'myWordcloud finished!\n'
+    print('myWordcloud finished!\n')
 
 
 # Run myWordcloud directly:

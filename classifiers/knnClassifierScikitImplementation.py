@@ -1,25 +1,26 @@
 import time
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 # from sklearn import preprocessing
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
 from supportFuncs import stopWords, readDatasets, crossValidation, appendTitleToContentXtimes
 
 
-def svm_classifier(stop_words, train_data, test_data, use_pipeline):
-    print('Running svmClassifier...\n')
+def knn(stop_words, train_data, test_data, use_pipeline):
+
+    print('Running knnClassifier scikit edition...\n')
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
     # print(headers[2:4]) #DEBUG!
 
     # Split train_dataset into 0.7% train and 0.3% test.
-    train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]],
-                                                        train_size=0.7, test_size=0.3)
+    train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]], train_size=0.7, test_size=0.3)
 
     # LE (currently not used..)
     # le = preprocessing.LabelEncoder()
@@ -41,7 +42,7 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
     scores = []
 
     if use_pipeline:
-        print('\nRunning pipeline-version of svmClassifier...')
+        print('\nRunning pipeline-version of knnClassifier...')
 
         # PipeLine.
         start_time_pipeline = time.time()
@@ -66,7 +67,7 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         print("Elapsed time of pipeline: ", time.time() - start_time_pipeline)
 
     else:
-        print('\nRunning successional-version of svmClassifier...')
+        print('\nRunning successional-version of knnClassifier...')
 
         start_time_successional = time.time()
 
@@ -78,9 +79,9 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         print("VectorTest shape::", vectorTest.shape)
 
         # TfidfTransformer
-        # tfidf = TfidfTransformer()
-        # vectorTrain = tfidf.fit_transform(vectorTrain)
-        # vectorTest = tfidf.transform(vectorTest)
+        tfidf = TfidfTransformer()
+        vectorTrain = tfidf.fit_transform(vectorTrain)
+        vectorTest = tfidf.transform(vectorTest)
 
         # TfidfVectorizer (it does the job of CountVectorizer & TfidfTransformer together)
         # tfidf_v = TfidfVectorizer(stopWords)
@@ -96,42 +97,42 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         print("VectorTest shape after LSA::", vectorTest.shape)
 
         # Normalizer
-        # norm = Normalizer(norm="l2", copy=True)
-        # vectorTrain = norm.fit_transform(vectorTrain)
-        # vectorTest = norm.transform(vectorTest)
+        norm = Normalizer(norm="l2", copy=True)
+        vectorTrain = norm.fit_transform(vectorTrain)
+        vectorTest = norm.transform(vectorTest)
 
         # CLF
-        clf = svm.SVC(kernel='linear', C=1.0)
-        # clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
+        clf = KNeighborsClassifier(n_neighbors= 10, weights= 'distance', algorithm= 'ball_tree', p= 2)
 
-        print('Running crossValidation on SVM...')
-        scores = crossValidation.get_scores_from_cross_validation(clf, vectorTrain, train_y)
+        #print 'Running crossValidation on knn...'
+        #scores = crossValidation.get_scores_from_cross_validation(clf, vectorTrain, train_y)
 
         # GridSearch (find the best parameters)
-        # parameters = {'kernel': ('linear', 'rbf'), 'C': [1.5, 10], 'gamma': [0, 'auto']}
-        # svr = svm.SVC()
+        # parameters = {'n_neighbors': [5, 10], 'weights': ['uniform', 'distance'], 'algorithm' : ['ball_tree', 'kd_tree', 'brute'], 'p': [1, 2]}
+        # svr = KNeighborsClassifier()
         # clf = GridSearchCV(svr, parameters)
 
-        # clf.fit(vectorTrain, train_y)
-        # y_pred = clf.predict(vectorTest)
+        clf.fit(vectorTrain, train_y)
+        y_pred = clf.predict(vectorTest)
         #
-        # print "Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain))
-        # print "Test Accuracy :: ", accuracy_score(test_y, y_pred)
+        print("Train Accuracy :: ", accuracy_score(train_y, clf.predict(vectorTrain)))
+        print("Test Accuracy :: ", accuracy_score(test_y, y_pred))
 
         # Best GridSearch params
         # print clf.best_params_
 
         print("Elapsed time of successional-run: ", time.time() - start_time_successional)
 
-    print('svmClassifier finished!\n')
+    print('knnClassifier finished!\n')
     return scores
 
 
 # Run svmClassifier directly:
 if __name__ == '__main__':
+
     data = readDatasets.read_dataset()
     trainData = data[0]
     testData = data[1]
     usePipeline = False
 
-    svm_classifier(stopWords.get_stop_words(), trainData, testData, usePipeline)
+    knn(stopWords.get_stop_words(), trainData, testData, usePipeline)

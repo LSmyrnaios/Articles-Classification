@@ -4,12 +4,11 @@ import csv
 
 
 def run_all_classifiers(stop_words, use_pipeline):
-
     data = readDatasets.read_dataset()
     train_data = data[0]
     test_data = data[1]
 
-    print 'Running the classifiers...\n'
+    print('Running the classifiers...\n')
 
     nbScores = nbClassifier.nb_classifier(stop_words, train_data, test_data, use_pipeline)
     rfScores = rfClassifier.rf_classifier(stop_words, train_data, test_data, use_pipeline)
@@ -17,23 +16,34 @@ def run_all_classifiers(stop_words, use_pipeline):
     # knnScores = knnClassifier.knn_classifier(stop_words, train_data, test_data)
     mymethodScores = MyMethodClassifier.my_method_classifier(stop_words, train_data, test_data)
 
+    '{:06.2f}'.format(3.141592653589793)
+
     # Open an outputCsvFile and write the scores which we will receive from the classifiers.
 
-    print 'Writing classifiers\' scores to the outputCsvFile...\n'
+    print('Writing classifiers\' scores to the outputCsvFile...\n')
 
-    with open('Resources/csv/EvaluationMetric_10fold.csv', 'wb') as csvfile:
+    with open('Resources/csv/EvaluationMetric_10fold.csv', mode='w', encoding="utf8") as csvfile:
         csvWriter = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
         # Write the Headers (first row & column).
-        csvWriter.writerow(['StatisticMeasure'] + ['NaiveBayes'] + ['Random Forest'] + ['SVM'] + ['KNN'] + ['My Method'])
+        csvWriter.writerow(['Statistic_Measure'] + ['Naive_Bayes'] + ['Random_Forest'] + ['SVM'] + ['KNN']
+                           + ['My_Method'])
 
         # Write the scores.
-        csvWriter.writerow(['Accuracy'] + [nbScores[0]] + [rfScores[0]] + [svmScores[0]] + ['knn'] + [mymethodScores[0]] )  # + [knnScores[0]] + [mymethodScores[0]])
-        csvWriter.writerow(['Precision'] + [nbScores[1]] + [rfScores[1]] + [svmScores[1]] + ['knn'] + [mymethodScores[1]] )  # + [knnScores[1]]] + [mymethodScores[1]])
-        csvWriter.writerow(['Recall'] + [nbScores[2]] + [rfScores[2]] + [svmScores[2]] + ['knn'] + [mymethodScores[2]] )  # + [knnScores[2]] + [mymethodScores[2]])
-        csvWriter.writerow(['F-Measure'] + [nbScores[3]] + [rfScores[3]] + [svmScores[3]] + ['knn'] + [mymethodScores[3]] )  # + [knnScores[3]]] + [mymethodScores[3]])
+        csvWriter.writerow(['Accuracy'] + ['{:.3}'.format(nbScores[0])] + ['{:.3}'.format(rfScores[0])]
+                           + ['{:.3}'.format(svmScores[0])] + ['knn'] + ['{:.3}'.format(mymethodScores[0])])
+        # + [knnScores[0]] + [mymethodScores[0]])
+        csvWriter.writerow(['Precision'] + ['{:.3}'.format(nbScores[1])] + ['{:.3}'.format(rfScores[1])]
+                           + ['{:.3}'.format(svmScores[1])] + ['knn'] + ['{:.3}'.format(mymethodScores[1])])
+        # + [knnScores[1]]] + [mymethodScores[1]])
+        csvWriter.writerow(['Recall'] + ['{:.3}'.format(nbScores[2])] + ['{:.3}'.format(rfScores[2])]
+                           + ['{:.3}'.format(svmScores[2])] + ['knn'] + ['{:.3}'.format(mymethodScores[2])])
+        # + [knnScores[2]] + [mymethodScores[2]])
+        csvWriter.writerow(['F-Measure'] + ['{:.3}'.format(nbScores[3])] + ['{:.3}'.format(rfScores[3])]
+                           + ['{:.3}'.format(svmScores[3])] + ['knn'] + ['{:.3}'.format(mymethodScores[3])])
+        # + [knnScores[3]]] + [mymethodScores[3]])
 
-    print 'Finished writing to the outputCsvFile!'
+    print('Finished writing to the outputCsvFile!')
 
 
 # Run all classifiers:

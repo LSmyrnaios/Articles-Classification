@@ -12,21 +12,21 @@ from supportFuncs import stopWords, readDatasets, appendTitleToContentXtimes, cr
 
 
 def rf_classifier(stop_words, train_data, test_data, use_pipeline):
-
-    print 'Running rfClassifier...\n'
+    print('Running rfClassifier...\n')
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
     # print(headers[2:4]) #DEBUG!
 
     # Split train_dataset into 0.7% train and 0.3% test.
-    train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]], train_size=0.7, test_size=0.3)
+    train_x, test_x, train_y, test_y = train_test_split(train_data[headers[2:4]], train_data[headers[-1]],
+                                                        train_size=0.7, test_size=0.3)
 
     # Train and Test dataset size details
-    print "Train_x Shape :: ", train_x.shape
-    print "Train_y Shape :: ", train_y.shape
-    print "Test_x Shape :: ", test_x.shape
-    print "Test_y Shape :: ", test_y.shape
-    print "Train_x colums ::", train_x.columns
+    print("Train_x Shape :: ", train_x.shape)
+    print("Train_y Shape :: ", train_y.shape)
+    print("Test_x Shape :: ", test_x.shape)
+    print("Test_y Shape :: ", test_y.shape)
+    print("Train_x colums ::", train_x.columns)
 
     train_x, test_x = appendTitleToContentXtimes.append_title_to_content_x_times(train_x, test_x, 1)
 
@@ -41,7 +41,7 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
     scores = []
 
     if use_pipeline:
-        print '\nRunning pipeline-version of rfClassifier...'
+        print('\nRunning pipeline-version of rfClassifier...')
 
         # PipeLine-test.
         start_time_pipeline = time.time()
@@ -59,13 +59,13 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
         # Now evaluate all steps on test set
         predicted_test = pipeline.predict(test_x['Content'])
 
-        print "Train Accuracy :: ", accuracy_score(train_y, predicted_train)
-        print "Test Accuracy  :: ", accuracy_score(test_y, predicted_test)
+        print("Train Accuracy :: ", accuracy_score(train_y, predicted_train))
+        print("Test Accuracy  :: ", accuracy_score(test_y, predicted_test))
 
-        print "Elapsed time of pipeline: ", time.time() - start_time_pipeline
+        print("Elapsed time of pipeline: ", time.time() - start_time_pipeline)
 
     else:
-        print '\nRunning successional-version of rfClassifier...'
+        print('\nRunning successional-version of rfClassifier...')
 
         start_time_successional = time.time()
 
@@ -73,8 +73,8 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
         count_vectorizer = CountVectorizer(stop_words)
         vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
         vectorTest = count_vectorizer.transform(test_x['Content'])
-        print "VectorTrain shape::", vectorTrain.shape
-        print "VectorTest shape::", vectorTest.shape
+        print("VectorTrain shape::", vectorTrain.shape)
+        print("VectorTest shape::", vectorTest.shape)
 
         # TfidfTransformer
         # tfidf = TfidfTransformer()
@@ -91,8 +91,8 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
         vectorTrain = lsa.fit_transform(vectorTrain)
         vectorTest = lsa.transform(vectorTest)
 
-        print "VectorTrain shape after LSA::", vectorTrain.shape
-        print "VectorTest shape after LSA::", vectorTest.shape
+        print("VectorTrain shape after LSA::", vectorTrain.shape)
+        print("VectorTest shape after LSA::", vectorTest.shape)
 
         # Normalizer
         # norm = Normalizer(norm="l2", copy=True)
@@ -102,7 +102,7 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
         # CLF
         clf = RandomForestClassifier(n_estimators=100)
 
-        print 'Running crossValidation on RandomForest...'
+        print('Running crossValidation on RandomForest...')
         scores = crossValidation.get_scores_from_cross_validation(clf, vectorTrain, train_y)
 
         # GridSearch
@@ -119,16 +119,14 @@ def rf_classifier(stop_words, train_data, test_data, use_pipeline):
         # Best GridSearch params
         # print clf.best_params_
 
-        print "Elapsed time of successional-run: ", time.time() - start_time_successional
+        print("Elapsed time of successional-run: ", time.time() - start_time_successional)
 
-
-    print 'rfClassifier finished!\n'
+    print('rfClassifier finished!\n')
     return scores
 
 
 # Run rfClassifier directly:
 if __name__ == '__main__':
-
     data = readDatasets.read_dataset()
     trainData = data[0]
     testData = data[1]

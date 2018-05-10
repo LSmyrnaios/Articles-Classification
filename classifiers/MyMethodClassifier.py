@@ -11,7 +11,7 @@ from supportFuncs import stopWords, readDatasets, appendTitleToContentXtimes, cr
 
 # This method is the optimized SVM-Classifer.
 def my_method_classifier(stop_words, train_data, test_data):
-    print 'Running myMethodClassifier...\n'
+    print('Running myMethodClassifier...\n')
 
     # headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
     # print(headers[2:4]) #DEBUG!
@@ -38,7 +38,7 @@ def my_method_classifier(stop_words, train_data, test_data):
     # List to be returned later.
     scores = []
 
-    print 'Running successional-version of myMethodClassifier...'
+    print('Running successional-version of myMethodClassifier...')
 
     start_time_successional = time.time()
 
@@ -46,8 +46,8 @@ def my_method_classifier(stop_words, train_data, test_data):
     count_vectorizer = CountVectorizer(stop_words)
     vectorTrain = count_vectorizer.fit_transform(train_data['Content'])
     vectorTest = count_vectorizer.transform(test_data['Content'])
-    print "VectorTrain shape::", vectorTrain.shape
-    print "VectorTest shape::", vectorTest.shape
+    print("VectorTrain shape::", vectorTrain.shape)
+    print("VectorTest shape::", vectorTest.shape)
 
     # TfidfTransformer
     tfidf = TfidfTransformer()
@@ -64,8 +64,8 @@ def my_method_classifier(stop_words, train_data, test_data):
     vectorTrain = lsa.fit_transform(vectorTrain)
     vectorTest = lsa.transform(vectorTest)
 
-    print "VectorTrain shape after LSA::", vectorTrain.shape
-    print "VectorTest shape after LSA::", vectorTest.shape
+    print("VectorTrain shape after LSA::", vectorTrain.shape)
+    print("VectorTest shape after LSA::", vectorTest.shape)
 
     # Normalizer
     norm = Normalizer(norm="l2", copy=True)
@@ -76,7 +76,7 @@ def my_method_classifier(stop_words, train_data, test_data):
     clf = svm.SVC(kernel='linear', C=1.0)
     # clf = svm.SVC(kernel='rbf', C=1.0, gamma='auto')
 
-    print 'Running crossValidation on MyMethod...'
+    print('Running crossValidation on MyMethod...')
     scores = crossValidation.get_scores_from_cross_validation(clf, vectorTrain, train_data['Category'])
 
     # GridSearch (find the best parameters)
@@ -96,9 +96,9 @@ def my_method_classifier(stop_words, train_data, test_data):
     # Best GridSearch params
     # print clf.best_params_
 
-    print "Elapsed time of successional-run: ", time.time() - start_time_successional
+    print("Elapsed time of successional-run: ", time.time() - start_time_successional)
 
-    print 'MyMethodClassifier finished!\n'
+    print('MyMethodClassifier finished!\n')
     return scores
 
 
