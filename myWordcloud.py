@@ -1,11 +1,18 @@
 # coding=utf-8
-from wordcloud import WordCloud
+try:
+    from wordcloud import WordCloud
+except ImportError:
+    import platform
+    if platform.system() == 'Windows':
+        print('WordCloud will not run, as Microsoft Visual C++ 14.0 is required to build it on Windows..!')
+    exit(-1)
+
 from supportFuncs import stopWords
 import csv
 
 
 def show_wordcloud(stop_words, data, title=None):
-    print("Creating wordcloud \"" + title + '\" img...')
+    print('Creating wordcloud "' + title + '" img...')
     WordCloud(
         background_color='black',
         stopwords=stop_words,

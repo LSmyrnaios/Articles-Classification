@@ -1,4 +1,11 @@
-from myWordcloud import my_wordcloud
+wordCloudWindowsProblem = False
+
+try:
+    from myWordcloud import my_wordcloud
+except:
+    wordCloudWindowsProblem = True
+
+
 from classifiers.__init__ import run_all_classifiers
 from supportFuncs import stopWords
 
@@ -8,5 +15,7 @@ if __name__ == '__main__':
     stop_words = stopWords.get_stop_words()
     usePipeline = False     # Pipeline currently not running crossValidation. Use the regular way.
 
-    my_wordcloud(stop_words)
+    if not wordCloudWindowsProblem:
+        my_wordcloud(stop_words)
+
     run_all_classifiers(stop_words, usePipeline)

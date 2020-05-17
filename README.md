@@ -8,3 +8,6 @@ To install all the dependencies on your virtual environment, run:
 To run all the classifiers and the WorldCloud script with python 3, run: 
 
 * python main.py
+
+If you are running on Windows, with the standard python library, you will need the `Microsoft Visual C++ 14.0`, for more information click [here](https://www.scivision.dev/python-windows-visual-c-14-required/). <br/>
+Since the above dependency requires many GBs to be installed, you can skip it and let the project run without the WordCloud (it automatically detects the missing dependency and skips running the WordCloud).
