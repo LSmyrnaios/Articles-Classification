@@ -10,7 +10,7 @@ from supportFuncs import stopWords, readDatasets, appendTitleToContentXtimes, cr
 
 
 # This method is the optimized SVM-Classifer.
-def my_method_classifier(stop_words, train_data, test_data):
+def my_method_classifier(stop_words, train_data, test_data, dynamic_datasets_path):
     print('Running myMethodClassifier...\n')
 
     # headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
@@ -43,7 +43,7 @@ def my_method_classifier(stop_words, train_data, test_data):
     start_time_successional = time.time()
 
     # Count Vectorizer
-    count_vectorizer = CountVectorizer(stop_words)
+    count_vectorizer = CountVectorizer(input=stop_words)
     vectorTrain = count_vectorizer.fit_transform(train_data['Content'])
     vectorTest = count_vectorizer.transform(test_data['Content'])
     print("VectorTrain shape::", vectorTrain.shape)
@@ -91,7 +91,7 @@ def my_method_classifier(stop_words, train_data, test_data):
     # print "Test Accuracy :: ", accuracy_score(train_data['Category'], y_pred)
 
     #y_pred = cross_val_predict(clf, X=vectorTrain, y=vectorTest, cv=10, n_jobs=multiprocessing.cpu_count())
-    writePredictionsToCsv.write_predictions_to_csv(y_pred, test_data)
+    writePredictionsToCsv.write_predictions_to_csv(y_pred, test_data, dynamic_datasets_path)
 
     # Best GridSearch params
     # print clf.best_params_
@@ -104,8 +104,10 @@ def my_method_classifier(stop_words, train_data, test_data):
 
 # Run myMethodClassifier directly:
 if __name__ == '__main__':
-    data = readDatasets.read_dataset()
+    dynamic_datasets_path = '..'
+    data = readDatasets.read_dataset(dynamic_datasets_path)
     trainData = data[0]
     testData = data[1]
 
-    my_method_classifier(stopWords.get_stop_words(), trainData, testData)
+    my_method_classifier(stopWords.get_stop_words(), trainData, testData, dynamic_datasets_path)
+    exit()

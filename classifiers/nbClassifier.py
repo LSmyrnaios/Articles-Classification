@@ -12,7 +12,6 @@ from supportFuncs import stopWords, readDatasets, appendTitleToContentXtimes, cr
 
 
 def nb_classifier(stop_words, train_data, test_data, use_pipeline):
-
     print('Running nbClassifier...\n')
 
     headers = ['RowNum', 'Id', 'Title', 'Content', 'Category']
@@ -47,7 +46,7 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
         start_time_pipeline = time.time()
 
         pipeline = Pipeline([
-            ('vect', CountVectorizer(stop_words)),
+            ('vect', CountVectorizer(input=stop_words)),
             # ('tfidf', TfidfTransformer()),
             # ('tfidf_v', TfidfVectorizer(stop_words)),
             # ('norm', Normalizer(norm="l2", copy=True)),
@@ -55,16 +54,16 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
         ])
 
         pipeline = pipeline.fit(train_x['Content'], train_y)
-        #accuracies = []
+        # accuracies = []
         # for i in range(10):
         predicted_train = pipeline.predict(train_x['Content'])
         # Now evaluate all steps on test set
         predicted_test = pipeline.predict(test_x['Content'])
         print("Train Accuracy :: ", accuracy_score(train_y, predicted_train))
         print("Test Accuracy  :: ", accuracy_score(test_y, predicted_test))
-        #accuracies.append(accuracy_score(test_y, predicted_test))
+        # accuracies.append(accuracy_score(test_y, predicted_test))
 
-        #print 'CrossValidation mean accuracy: ', np.mean(accuracies)
+        # print 'CrossValidation mean accuracy: ', np.mean(accuracies)
 
         print("Elapsed time of pipeline: ", time.time() - start_time_pipeline)
 
@@ -74,7 +73,7 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
         start_time_successional = time.time()
 
         # Count Vectorizer
-        count_vectorizer = CountVectorizer(stop_words)
+        count_vectorizer = CountVectorizer(input=stop_words)
         vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
         vectorTest = count_vectorizer.transform(test_x['Content'])
         print("VectorTrain shape::", vectorTrain.shape)
@@ -119,17 +118,17 @@ def nb_classifier(stop_words, train_data, test_data, use_pipeline):
 
         print("Elapsed time of successional-run: ", time.time() - start_time_successional)
 
-
     print('nbClassifier finished!\n')
     return scores
 
 
 # Run nbClassifier directly:
 if __name__ == '__main__':
-
-    data = readDatasets.read_dataset()
+    dynamic_datasets_path = '..'
+    data = readDatasets.read_dataset(dynamic_datasets_path)
     trainData = data[0]
     testData = data[1]
     usePipeline = False
 
     nb_classifier(stopWords.get_stop_words(), trainData, testData, usePipeline)
+    exit()

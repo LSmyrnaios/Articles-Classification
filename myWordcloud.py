@@ -1,4 +1,6 @@
 # coding=utf-8
+import os
+
 try:
     from wordcloud import WordCloud
 except ImportError:
@@ -11,8 +13,9 @@ from supportFuncs import stopWords
 import csv
 
 
-def show_wordcloud(stop_words, data, title=None):
-    print('Creating wordcloud "' + title + '" img...')
+def show_wordcloud(stop_words, data, title=None, dynamic_datasets_path=''):
+    print('Creating WordCloud "' + title + '" image...')
+    image_location = os.path.join(dynamic_datasets_path, 'Resources', 'images', title + '.png')
     WordCloud(
         background_color='black',
         stopwords=stop_words,
@@ -20,10 +23,10 @@ def show_wordcloud(stop_words, data, title=None):
         max_font_size=40,
         scale=5,
         random_state=1
-    ).generate(str(data)).to_file("Resources/img/" + title + ".png")
+    ).generate(str(data)).to_file(image_location)
 
 
-def my_wordcloud(stop_words):
+def my_wordcloud(stop_words, dynamic_datasets_path):
     print('Running myWordcloud...\n')
 
     # print 'StopWords ', stop_words
@@ -34,7 +37,9 @@ def my_wordcloud(stop_words):
     filmStr = ''
     technologyStr = ''
 
-    with open('Resources/csv/train_set.csv', mode='r', encoding="utf8") as csvfile:
+    location_train = os.path.join(dynamic_datasets_path, 'Resources', 'datasets', 'train_set.csv')
+
+    with open(location_train, mode='r', encoding="utf8") as csvfile:
         csvReader = csv.DictReader(csvfile, delimiter='\t', quotechar='|')
 
         for row in csvReader:
@@ -50,15 +55,17 @@ def my_wordcloud(stop_words):
             elif category == 'Technology':
                 technologyStr += row["Content"]
 
-    show_wordcloud(stop_words, businessStr, 'Business')
-    show_wordcloud(stop_words, politicsStr, 'Politics')
-    show_wordcloud(stop_words, footballStr, 'Football')
-    show_wordcloud(stop_words, filmStr, 'Film')
-    show_wordcloud(stop_words, technologyStr, 'Technology')
+    show_wordcloud(stop_words, businessStr, 'Business', dynamic_datasets_path)
+    show_wordcloud(stop_words, politicsStr, 'Politics', dynamic_datasets_path)
+    show_wordcloud(stop_words, footballStr, 'Football', dynamic_datasets_path)
+    show_wordcloud(stop_words, filmStr, 'Film', dynamic_datasets_path)
+    show_wordcloud(stop_words, technologyStr, 'Technology', dynamic_datasets_path)
 
     print('myWordcloud finished!\n')
 
 
 # Run myWordcloud directly:
 if __name__ == '__main__':
-    my_wordcloud(stopWords.get_stop_words())
+    dynamic_datasets_path = ''
+    my_wordcloud(stopWords.get_stop_words(), dynamic_datasets_path)
+    exit()

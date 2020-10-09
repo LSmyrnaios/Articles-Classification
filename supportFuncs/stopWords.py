@@ -56,4 +56,5 @@ def get_stop_words():
 
 # Run and print stopWords directly:
 if __name__ == '__main__':
-    print((get_stop_words()))
+    print(get_stop_words())
+    exit()

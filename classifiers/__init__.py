@@ -1,10 +1,12 @@
+import os
+
 from classifiers import rfClassifier, svmClassifier, nbClassifier, MyMethodClassifier
 from supportFuncs import stopWords, readDatasets
 import csv
 
 
-def run_all_classifiers(stop_words, use_pipeline):
-    data = readDatasets.read_dataset()
+def run_all_classifiers(stop_words, use_pipeline, dynamic_datasets_path):
+    data = readDatasets.read_dataset(dynamic_datasets_path)
     train_data = data[0]
     test_data = data[1]
 
@@ -14,7 +16,7 @@ def run_all_classifiers(stop_words, use_pipeline):
     rfScores = rfClassifier.rf_classifier(stop_words, train_data, test_data, use_pipeline)
     svmScores = svmClassifier.svm_classifier(stop_words, train_data, test_data, use_pipeline)
     # knnScores = knnClassifier.knn_classifier(stop_words, train_data, test_data)
-    mymethodScores = MyMethodClassifier.my_method_classifier(stop_words, train_data, test_data)
+    mymethodScores = MyMethodClassifier.my_method_classifier(stop_words, train_data, test_data, dynamic_datasets_path)
 
     '{:06.2f}'.format(3.141592653589793)
 
@@ -22,7 +24,9 @@ def run_all_classifiers(stop_words, use_pipeline):
 
     print('Writing classifiers\' scores to the outputCsvFile...\n')
 
-    with open('Resources/csv/EvaluationMetric_10fold.csv', mode='w', encoding="utf8") as csvfile:
+    location_10_fold = os.path.join(dynamic_datasets_path, 'Resources', 'datasets', 'EvaluationMetric_10fold.csv')
+
+    with open(location_10_fold, mode='w', encoding="utf8") as csvfile:
         csvWriter = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
         # Write the Headers (first row & column).
@@ -49,4 +53,6 @@ def run_all_classifiers(stop_words, use_pipeline):
 # Run all classifiers:
 if __name__ == '__main__':
     usePipeline = False
-    run_all_classifiers(stopWords.get_stop_words(), usePipeline)
+    dynamic_datasets_path = '..'
+    run_all_classifiers(stopWords.get_stop_words(), usePipeline, dynamic_datasets_path)
+    exit()

@@ -15,7 +15,10 @@ if __name__ == '__main__':
     stop_words = stopWords.get_stop_words()
     usePipeline = False     # Pipeline currently not running crossValidation. Use the regular way.
 
-    if not wordCloudWindowsProblem:
-        my_wordcloud(stop_words)
+    dynamic_datasets_path = ''
 
-    run_all_classifiers(stop_words, usePipeline)
+    if not wordCloudWindowsProblem:
+        my_wordcloud(stop_words, dynamic_datasets_path)
+
+    run_all_classifiers(stop_words, usePipeline, dynamic_datasets_path)
+    exit()

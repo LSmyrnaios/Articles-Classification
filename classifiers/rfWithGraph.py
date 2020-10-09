@@ -1,3 +1,4 @@
+import os
 import time
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import TruncatedSVD
@@ -51,7 +52,7 @@ def rf_classifier_with_graph(stop_words, train_data, test_data, use_pipeline):
         start_time_pipeline = time.time()
 
         pipeline = Pipeline([
-            ('vect', CountVectorizer(stop_words)),
+            ('vect', CountVectorizer(input=stop_words)),
             ('tfidf', TfidfTransformer()),
             # ('tfidf_v', TfidfVectorizer(stopWords)),
             ('lsa', TruncatedSVD(n_components=100)),
@@ -72,7 +73,7 @@ def rf_classifier_with_graph(stop_words, train_data, test_data, use_pipeline):
         print('\nRunning successional-version of rfClassifier...')
 
         # Count Vectorizer
-        count_vectorizer = CountVectorizer(stop_words)
+        count_vectorizer = CountVectorizer(input=stop_words)
 
         # LSA
         for x in range(1, 101, 10):
@@ -117,7 +118,7 @@ def rf_classifier_with_graph(stop_words, train_data, test_data, use_pipeline):
     plt.title('RandomForestClassifier Accuracy Graph')
     plt.plot(x_new, y_smooth, color='r')
     plt.scatter(x, y)
-    plt.savefig("Resources/img/RandomForestClassifier Accuracy Graph.png")
+    plt.savefig(os.path.join(dynamic_datasets_path, 'Resources', 'images', 'RandomForestClassifier Accuracy Graph.png'))
     plt.show()
     print('rfClassifier finished!\n')
     return scores
@@ -125,10 +126,11 @@ def rf_classifier_with_graph(stop_words, train_data, test_data, use_pipeline):
 
 # Run rfClassifier directly:
 if __name__ == '__main__':
-
-    data = readDatasets.read_dataset()
+    dynamic_datasets_path = '..'
+    data = readDatasets.read_dataset(dynamic_datasets_path)
     trainData = data[0]
     testData = data[1]
     usePipeline = False
 
     rf_classifier_with_graph(stopWords.get_stop_words(), trainData, testData, usePipeline)
+    exit()

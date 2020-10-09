@@ -47,7 +47,7 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         start_time_pipeline = time.time()
 
         pipeline = Pipeline([
-            ('vect', CountVectorizer(stop_words)),
+            ('vect', CountVectorizer(input=stop_words)),
             # ('tfidf', TfidfTransformer()),
             # ('tfidf_v', TfidfVectorizer(stop_words)),
             ('lsa', TruncatedSVD(n_components=100)),
@@ -71,7 +71,7 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
         start_time_successional = time.time()
 
         # Count Vectorizer
-        count_vectorizer = CountVectorizer(stop_words)
+        count_vectorizer = CountVectorizer(input=stop_words)
         vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
         vectorTest = count_vectorizer.transform(test_x['Content'])
         print("VectorTrain shape::", vectorTrain.shape)
@@ -129,9 +129,11 @@ def svm_classifier(stop_words, train_data, test_data, use_pipeline):
 
 # Run svmClassifier directly:
 if __name__ == '__main__':
-    data = readDatasets.read_dataset()
+    dynamic_datasets_path = '..'
+    data = readDatasets.read_dataset(dynamic_datasets_path)
     trainData = data[0]
     testData = data[1]
     usePipeline = False
 
     svm_classifier(stopWords.get_stop_words(), trainData, testData, usePipeline)
+    exit()

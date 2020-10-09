@@ -90,7 +90,7 @@ def knn_classifier(stop_words, train_data, test_data):  # It's uncertain if we w
     # test_x = le.fit(test_x)
 
     # Count Vectorizer
-    count_vectorizer = CountVectorizer(stop_words)
+    count_vectorizer = CountVectorizer(input=stop_words)
     vectorTrain = count_vectorizer.fit_transform(train_x['Content'])
     vectorTest = count_vectorizer.transform(test_x['Content'])
     print("VectorTrain shape::", vectorTrain.shape)
@@ -150,8 +150,10 @@ def knn_classifier(stop_words, train_data, test_data):  # It's uncertain if we w
 
 # Run knnClassifier directly:
 if __name__ == '__main__':
-    data = readDatasets.read_dataset()
+    dynamic_datasets_path = '..'
+    data = readDatasets.read_dataset(dynamic_datasets_path)
     trainData = data[0]
     testData = data[1]
 
     knn_classifier(stopWords.get_stop_words(), trainData, testData)
+    exit()
